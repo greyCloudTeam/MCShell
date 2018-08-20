@@ -80,73 +80,77 @@ public class View extends Thread{
 			
 			while(!stop) {
 				try {
-					int id=0;
-					if(compression) {
-						int length=cfg.readVarInt(di);
-						cfg.println(name,1,"收到数据 "+length+" byte");
-						length=cfg.readVarInt(di);
-						cfg.println(name,1,"解压后数据长度:"+length+"byte");
-						if(length==0) {
-							id=cfg.readVarInt(di);
-							cfg.println(name,1,"收到数据包,id:"+id);
-						}
-					}else {
-						int length=cfg.readVarInt(di);
-						cfg.println(name,1,"收到数据 "+length+" byte");
-						id=cfg.readVarInt(di);
-						cfg.println(name,1,"收到数据包,id:"+id);
-					}
+					pack ri=new pack(di,compression);
+					cfg.println(name,1, "接收到数据包\n长度:"+ri.data.length+"\tid:"+ri.id);
 					if(mode==MODE_LOGIN) {
-						if(id==0x00) {
-							int motd=cfg.readVarInt(di);
-							byte[] temp1=new byte[motd];
-							di.readFully(temp1);
-							String motdT=new String(temp1);
-							throw new RuntimeException("不能连接这个服务器:\n"+motdT);
-						}else if(id==0x03) {
+						if(ri.id==0x00) {
+							throw new RuntimeException("不能连接这个服务器:\n"+ri.readString());
+						}else if(ri.id==0x03) {
 							cfg.println(name,2,"服务器要求启用压缩...");
-							int value=cfg.readVarInt(di);
+							int value=ri.readVarInt();
 							cfg.println(name,2,"压缩前最大数据包大小:"+value+"byte");
 							maxPackSize=value;
 							compression=true;
-						}else if(id==0x02) {
-							
-							int uuidLength=cfg.readVarInt(di);
-							byte[] uuidByte=new byte[uuidLength];
-							di.readFully(uuidByte);
-							uuid=new String(uuidByte);
-							
-							int usernameLength=cfg.readVarInt(di);
-							byte[] usernameByte=new byte[usernameLength];
-							di.readFully(usernameByte);
-							this.username=new String(usernameByte);
+						}else if(ri.id==0x02) {
+							uuid=ri.readString();
+							this.username=ri.readString();
 							mode=MODE_PLAY;
 							
 							cfg.println(name,1,"登陆成功!\n"+
 									"uuid:"+uuid+"\n"+
 									"username:"+this.username);
-						}else if(id==0x01) {
+						}else if(ri.id==0x01) {
 							cfg.println(name,3,"服务器开启了正版验证");
 							break;
 						}
 					}else if(mode==MODE_PLAY) {
-						if(id==0x23) {//join game
+						if(ri.id==0x23) {//join game
 							cfg.println(name, 2,"连接到游戏");
-							int eid=di.readInt();//实体id
-							int gamemode=di.readUnsignedByte();//游戏模式，0生存，1，创造，2冒险，3旁观
-							int world=di.readInt();//不清楚，-1虚空，0主世界，1结束
-							int dif=di.readUnsignedByte();//难度，0和平，1简单，2普通，3困难
-							int max=di.readUnsignedByte();//最大玩家，曾经被客户端用来绘制玩家列表，但现在被忽略了
-							int typeLength=cfg.readVarInt(di);
-							byte[] typeByte=new byte[typeLength];
-							di.readFully(typeByte);
-							String type=new String(typeByte);//可以有default, flat, largeBiomes, amplified, default_1_1，对应：默认，平坦，大型生物群系，已放大，默认_1_1
-							byte RDI=di.readByte();//Reduced Debug Info的简写，减少调试信息，对MCShell来说是没有用的，0x01表示为true，0x00表示为false
+							int eid=ri.readInt();//实体id
+							int gamemode=ri.readUnsignedByte();//游戏模式，0生存，1，创造，2冒险，3旁观
+							String modeT="未知:"+gamemode;
+							if(gamemode==0)
+								modeT="生存";
+							if(gamemode==1)
+								modeT="创造";
+							if(gamemode==2)
+								modeT="冒险";
+							if(gamemode==3)
+								modeT="旁观";
+							int world=ri.readInt();//不清楚，-1虚空，0主世界，1结束
+							String worldT="未知:"+world;
+							if(world==-1)
+								worldT="虚空";
+							if(world==0)
+								worldT="主世界";
+							if(world==1)
+								worldT="结束?";
+							int dif=ri.readUnsignedByte();//难度，0和平，1简单，2普通，3困难
+							String difT="未知:"+dif;
+							if(dif==0)
+								difT="和平";
+							if(dif==1)
+								difT="简单";
+							if(dif==2)
+								difT="普通";
+							if(dif==3)
+								difT="困难";
+							int max=ri.readUnsignedByte();//最大玩家，曾经被客户端用来绘制玩家列表，但现在被忽略了
+							String type=ri.readString();//可以有default, flat, largeBiomes, amplified, default_1_1，对应：默认，平坦，大型生物群系，已放大，默认_1_1
+							if(type.equals("default"))
+								type="普通,默认";
+							if(type.equals("flat"))
+								type="平坦";
+							if(type.equals("largeBiomes"))
+								type="大型生物群系";
+							if(type.equals("default_1_1"))
+								type="默认_1_1";
+							boolean RDI=ri.readBoolean();//Reduced Debug Info的简写，减少调试信息，对MCShell来说是没有用的，0x01表示为true，0x00表示为false
 							cfg.println(name,1,"服务器地图信息\n"+
 											"实体id:"+eid+"\n"+
-											"游戏模式(gamemode):"+gamemode+"\n"+
-											"当前位置:"+world+"\n"+
-											"难度:"+dif+"\n"+
+											"游戏模式(gamemode):"+modeT+"\n"+
+											"当前位置:"+worldT+"\n"+
+											"难度:"+difT+"\n"+
 											"最大玩家:"+max+"\n"+
 											"地图类型:"+type+"\n"+
 											"减少调试信息?:"+RDI);

@@ -8,5 +8,4 @@ public class main {
 		command t=new command();
 		t.start();
 	}
-
 }

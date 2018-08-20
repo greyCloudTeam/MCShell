@@ -54,34 +54,7 @@ public class cfg {
 			System.out.println();
 		}
 	}
-	public static int readVarInt(DataInputStream in) throws IOException {
-		int numRead = 0 ;
-	    int result = 0 ;
-	    byte read;
-	    do{
-	    	read = in.readByte();
-	        int value = (read & 0b01111111);
-	        result |= (value << ( 7 * numRead));
 
-	        numRead ++;
-	        if (numRead > 5 ) {
-	            throw new RuntimeException ("VarInt too big");
-	        }
-	     } while ((read & 0b10000000) != 0);
-
-	     return result;
-		/*
-		int i = 0;
-		int j = 0;
-		while (true) {
-			int k = in.readByte();
-			i |= (k & 0x7F) << j++ * 7;
-			if (j > 5) throw new RuntimeException("VarInt too big");
-			if ((k & 0x80) != 128) break;
-		}
-		return i;
-		*/
-	}
 	public static void jumpView(String id) {
 		if(!allView.containsKey(id)) {
 			println(3,"视图不存在");
@@ -111,6 +84,23 @@ public class cfg {
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
         return cipher.doFinal(plainData);
     }
+	public static int readVarInt(DataInputStream in) throws IOException {
+		int numRead = 0 ;
+	    int result = 0 ;
+	    byte read;
+	    do{
+	    	read = in.readByte();
+	        int value = (read & 0b01111111);
+	        result |= (value << ( 7 * numRead));
+
+	        numRead ++;
+	        if (numRead > 5 ) {
+	            throw new RuntimeException ("VarInt too big");
+	        }
+	     } while ((read & 0b10000000) != 0);
+
+	     return result;
+	}
 	public static void pingList(String ip,String port) {
 		Socket s;
 		InputStream is=null;
@@ -156,16 +146,12 @@ public class cfg {
 			dos.flush();
 			cfg.println(1,"已发送，等待服务器的响应....");
 			
-			cfg.println(1,"收到数据 "+cfg.readVarInt(di)+" byte");
-			int id=cfg.readVarInt(di);
-			cfg.println(1,"收到数据包,id:"+id);
-			if(id!=0x00) {
+			pack ri=new pack(di,false);
+			println(1, "接收到数据包\n长度:"+ri.data.length+"\tid:"+ri.id);
+			if(ri.id!=0x00) {
 				throw new RuntimeException("错误的id");
 			}
-			int motd=cfg.readVarInt(di);
-			byte[] temp1=new byte[motd];
-			di.readFully(temp1);
-			String motdT=new String(temp1);
+			String motdT=ri.readString();
 			cfg.println(1,"-----------------------------------------------------------------------------");
 			JsonParser json=new JsonParser();
             JsonElement part5 = json.parse(motdT);
@@ -177,19 +163,25 @@ public class cfg {
             cfg.println(1,"最大人数:"+part1.getAsJsonObject().get("max").getAsInt());
             cfg.println(1,"在线玩家数:"+part1.getAsJsonObject().get("online").getAsInt());
             String player="";
-            JsonArray part7=part1.getAsJsonObject().get("sample").getAsJsonArray();
-            Iterator it=part7.iterator();
-            int point=0;
-            while(it.hasNext()){
-            	if(point==10) {
-            		break;
-            	}
-                JsonElement e = (JsonElement)it.next();
-                player=player+"\t"+e.getAsJsonObject().get("name").getAsString();
-                point++;
-                //System.out.print(+",");
+            JsonElement temp=part1.getAsJsonObject().get("sample");
+            if(temp!=null) {
+            	JsonArray part7=temp.getAsJsonArray();
+                Iterator it=part7.iterator();
+                int point=0;
+                while(it.hasNext()){
+                	if(point==10) {
+                		break;
+                	}
+                    JsonElement e = (JsonElement)it.next();
+                    player=player+"\t"+e.getAsJsonObject().get("name").getAsString();
+                    point++;
+                    //System.out.print(+",");
+                }
+                cfg.println(1,"玩家列表(仅显示前10名):\n"+player);
+            }else {
+            	cfg.println(2,"\t玩家列表不存在或没有玩家");
             }
-            cfg.println(1,"玩家列表(仅显示前10名):\n"+player);
+            
             //println(1,"description:"+) <-WARNING!!!!!!!
             cfg.println(1,"-----------------------------------------------------------------------------");
 		}catch(Exception e) {
@@ -209,13 +201,13 @@ public class cfg {
 			cfg.writeVarInt(dos, ping.length); //prepend size
 			dos.write(ping); //write handshake packet
 			dos.flush();
-			cfg.println(1,"收到数据 "+cfg.readVarInt(di)+" byte");
-			int id=cfg.readVarInt(di);
-			cfg.println(1,"收到数据包,id:"+id);
-			if(id!=0x01) {
+			
+			pack ri=new pack(di,false);
+			println(1, "接收到数据包\n长度:"+ri.data.length+"\tid:"+ri.id);
+			if(ri.id!=0x01) {
 				throw new RuntimeException("错误的id");
 			}
-			cfg.println(1,"服务器延迟,"+(System.currentTimeMillis()-di.readLong())+"ms");
+			cfg.println(1,"服务器延迟,"+(System.currentTimeMillis()-ri.readLong())+"ms");
 		}catch(RuntimeException e) {
 			e.printStackTrace();
 		}catch(Exception e) {
