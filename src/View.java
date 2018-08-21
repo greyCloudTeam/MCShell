@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.security.PublicKey;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import javax.crypto.Cipher;
@@ -154,16 +155,40 @@ public class View extends Thread{
 											"最大玩家:"+max+"\n"+
 											"地图类型:"+type+"\n"+
 											"减少调试信息?:"+RDI);
+						}else if(ri.id==0x18) {
+							String name=ri.readString();
+							byte[] data=ri.getAllData();
+							cfg.println(this.name, 2,"接收到服务端的插件信息\n"+
+										"插件名字:"+name+"\t数据:"+Arrays.toString(data)+"\n"+
+										"转换为文本:"+new String(data));
+							
+						}else if(ri.id==0x0d) {
+							int dif=ri.readUnsignedByte();
+							String text="未知:"+dif;
+							if(dif==0)
+								text="和平";
+							if(dif==1)
+								text="简单";
+							if(dif==2)
+								text="普通";
+							if(dif==3)
+								text="困难";
+							cfg.println(this.name,2,"服务端要求更改难度:"+text);
+						}else if(ri.id==0x2c) {
+							byte nl=ri.readByte();
+							cfg.println(name, 2, "你拥有这些能力:"+nl);
 						}
 					}
 				}catch(EOFException e1) {
 					//cfg.println(name,3,"读取消息时出错:"+e1);
 					//break;
 				}catch(RuntimeException e2) {
-					cfg.println(name,3,"读取消息时出错:"+e2);
+					e2.printStackTrace();
+					cfg.println(name,3,"登陆时出错:"+e2);
 					break;
 				}catch(Exception e3) {
 					cfg.println(name,3,"读取消息时出错:"+e3);
+					e3.printStackTrace();
 				}
 			}
 		}catch(Exception e){

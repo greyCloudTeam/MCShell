@@ -51,7 +51,7 @@ public class pack {
 		return re;
 	}
 	public byte[] getAllData() {
-		byte[] data=new byte[this.data.length-point];
+		byte[] data=new byte[this.data.length-point];//0-24 0-10 14``
 		readFully(data);
 		return data;
 	}

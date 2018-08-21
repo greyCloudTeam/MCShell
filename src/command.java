@@ -88,6 +88,20 @@ public class command extends Thread {
 			cfg.println(1, "请等待....");
 			cfg.pingList(c[1],c[2]);
 			return;
+		}else if(c[0].equals("setUsername")) {
+			if(!main.path.equals("View-Main")) {
+				cfg.println(3, "不能在非main视图中使用这个命令");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			if(c.length!=2) {
+				cfg.println(3, "传递的参数不正确");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			cfg.username=c[1];
 		}else if(c[0].equals("login")) {
 			if(!main.path.equals("View-Main")) {
 				cfg.println(3, "不能在非main视图中使用这个命令");
