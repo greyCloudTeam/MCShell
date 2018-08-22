@@ -51,7 +51,7 @@ public class cfg {
 		if(allView.get(view).hide) {
 			allView.get(view).leaveMsg+=head+msg+"\n";
 		}else {
-			System.out.println();
+			System.out.println(head+msg);
 		}
 	}
 
@@ -68,16 +68,7 @@ public class cfg {
 		main.path=id;
 		commandStop=false;
 	}
-	public static void writeVarInt(DataOutputStream out, int paramInt) throws IOException {
-		while (true) {
-			if ((paramInt & 0xFFFFFF80) == 0) {
-				out.writeByte(paramInt);
-				return;
-			}
-			out.writeByte(paramInt & 0x7F | 0x80);
-			paramInt >>>= 7;
-		}
-	}
+	
 	public static byte[] encryptByPublicKey(byte[] plainData, PublicKey publicKey)
             throws Exception {
         Cipher cipher = Cipher.getInstance(publicKey.getAlgorithm());
@@ -110,43 +101,31 @@ public class cfg {
 		try {
 			int portT=Integer.parseInt(port);
 			s=new Socket(ip,portT);
-			cfg.println(1,"成功连接服务器！");
-			
 			is=s.getInputStream();
 			di=new DataInputStream(is);
 			os=s.getOutputStream();
 			dos=new DataOutputStream(os);
-			
+			cfg.println(1,"成功连接服务器！");
 			cfg.println(1,"准备数据包....");
-			ByteArrayOutputStream b ;
-			DataOutputStream handshake;
-			b= new ByteArrayOutputStream();
-			handshake = new DataOutputStream(b);
-			handshake.write(0x00);
-			cfg.writeVarInt(handshake,-1);//版本号未知
-			cfg.writeVarInt(handshake,ip.length()); //ip地址长度
-			handshake.writeBytes(ip); //ip
-			handshake.writeShort(portT); //port
-			cfg.writeVarInt(handshake, 1); //state (1 for handshake)
-			byte[] hand=b.toByteArray();
 			
-			b = new ByteArrayOutputStream();
-			handshake = new DataOutputStream(b);
-			handshake.write(0x00);
-			byte[] pack=b.toByteArray();
+			sendPack hand=new sendPack(dos,0x00);
+			hand.writeVarInt(-1);
+			hand.writeString(ip);
+			hand.thisPack.writeShort(portT);
+			hand.writeVarInt(1);
 			
-			/*
+			sendPack pack=new sendPack(dos,0x00);
 			
-			*/
+			sendPack.writeVarInt(dos,hand.b.toByteArray().length);
+			dos.write(hand.b.toByteArray());
 			
-			cfg.writeVarInt(dos, hand.length); //prepend size
-			dos.write(hand); //write handshake packet
-			cfg.writeVarInt(dos, pack.length); //prepend size
-			dos.write(pack); //write handshake packet
+			sendPack.writeVarInt(dos,pack.b.toByteArray().length);
+			dos.write(pack.b.toByteArray());
+
 			dos.flush();
 			cfg.println(1,"已发送，等待服务器的响应....");
 			
-			pack ri=new pack(di,false);
+			acceptPack ri=new acceptPack(di,false);
 			println(1, "接收到数据包\n长度:"+ri.data.length+"\tid:"+ri.id);
 			if(ri.id!=0x00) {
 				throw new RuntimeException("错误的id");
@@ -190,19 +169,14 @@ public class cfg {
 		
 		try {
 			cfg.println(1,"ping....");
-			ByteArrayOutputStream b ;
-			DataOutputStream handshake;
-			b= new ByteArrayOutputStream();
-			handshake = new DataOutputStream(b);
-			handshake.write(0x01);
-			handshake.writeLong(System.currentTimeMillis());
-			byte[] ping=b.toByteArray();
 			
-			cfg.writeVarInt(dos, ping.length); //prepend size
-			dos.write(ping); //write handshake packet
+			sendPack ping=new sendPack(dos,0x01);
+			ping.thisPack.writeLong(System.currentTimeMillis());
+			
+			ping.sendPack(false,-1);
 			dos.flush();
 			
-			pack ri=new pack(di,false);
+			acceptPack ri=new acceptPack(di,false);
 			println(1, "接收到数据包\n长度:"+ri.data.length+"\tid:"+ri.id);
 			if(ri.id!=0x01) {
 				throw new RuntimeException("错误的id");

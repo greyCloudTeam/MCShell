@@ -1,13 +1,17 @@
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
-public class pack {
+public class acceptPack {
 	public byte[] data=null;
 	public int id=-1;
 	public int point=0;//当前位置，读数据的时候也要包括这个
 	private static ByteBuffer buffer = ByteBuffer.allocate(8); 
-	public pack(byte[] data) {
+	public byte[] thenData=null;
+	public acceptPack(byte[] data) {
 		this.data=data;
 		try {
 			id=readVarInt();
@@ -16,26 +20,21 @@ public class pack {
 			e.printStackTrace();
 		}
 	}
-	public pack(DataInputStream in,boolean compress) {
-		try {
+	public acceptPack(DataInputStream in,boolean compress) throws IOException {
 			int length=cfg.readVarInt(in);
 			this.data=new byte[length];
 			in.readFully(data);
+			this.thenData=data;
 			if(compress) {
 				int trueLength=readVarInt();
 				if(trueLength!=0) {
 					byte[] temp=getAllData();
-					byte[] then=ZLibUtils.decompress(data);
+					byte[] then=ZLibUtils.decompress(temp);
 					this.data=then;
 					point=0;
 				}
 			}
 			id=readVarInt();
-		} catch (IOException e) {
-			// TODO 自动生成的 catch 块
-			e.printStackTrace();
-		}
-		
 	}
 	public String readString() {//有了这个就方便多了
 		String re="";
@@ -70,6 +69,11 @@ public class pack {
 		readFully(temp);
 		return bytesToLong(temp);
 	}
+	public double readDouble() {
+		byte[] temp=new byte[8];
+		readFully(temp);
+		return bytes2Double(temp);
+	}
 	public int readUnsignedByte() {
 		Byte b=readByte();
 		Integer i=b.intValue();
@@ -86,7 +90,35 @@ public class pack {
 		}
 		return false;
 	}
+	public float readFloat() {
+		byte[] temp=new byte[4];
+		readFully(temp);
+		return byte2float(temp);
+	}
+	/**
+	 * 字节转换为浮点
+	 * 
+	 * @param b 字节（至少4个字节）
+	 * @param index 开始位置
+	 * @return
+	 */
+	public static float byte2float(byte[] b) {  
+		ByteBuffer buf=ByteBuffer.allocateDirect(4); //无额外内存的直接缓存
+		//buf=buf.order(ByteOrder.LITTLE_ENDIAN);//默认大端，小端用这行
+		buf.put(b);
+		buf.rewind();
+		float f2=buf.getFloat();       
+		return f2;
+	}
+	public static double bytes2Double(byte[] arr) {
+		long value = 0;
+		for (int i = 0; i < 8; i++) {
+			value |= ((long) (arr[i] & 0xff)) << (8 * i);
+		}
+		return Double.longBitsToDouble(value);
+	}
 	public static long bytesToLong(byte[] bytes) {
+		buffer.clear();
         buffer.put(bytes, 0, bytes.length);
         buffer.flip();//need flip 
         return buffer.getLong();
@@ -154,4 +186,5 @@ public class pack {
 			by[i]=readByte();
 		}
 	}
+	
 }
