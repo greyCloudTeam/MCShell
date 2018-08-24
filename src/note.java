@@ -1,16 +1,16 @@
 /*
-			//<----------WARNING---ÏÂÃæµÄ´úÂëÊÇ¼ÓÃÜµÄ£¬µ«ÊÇÃ»ÓÐÕý°æÕËºÅ×ö²âÊÔ£¬ËùÒÔÒ²¾ÍÃ»ÓÃÁË
+			//<----------WARNING---å¨‘æ’³îƒ‰å¨¼ä¼´æƒƒé•î„æ•©é–»î†»ç„¦å¦²æå´é˜èŒ¬æ§•é–»ã„¥å«¸ç»±æ¿‡æ‹…é¡æ¨»Ð¦æ¿žå±¸å‰å©€ä½¸î¢é”å›§î•¼é æ„¶ç®‘è¤°å—å´‘å§˜î… ã‚´é å›¨æ´©ç»±æ¿‹å¹é”ŸèŠ¥ç¦’éŠ‰ã‚‡ç˜éå¿šé²¸é¥å‘´æ‚½éŠŠã‚‡å•Š
 			int serverIDL=readVarInt(di);
 			byte[] serverIDB=new byte[serverIDL];
 			di.readFully(serverIDB);
 			String serverID=new String(serverIDB);
 			
-			//int PKL=readVarInt(di); <--WARNING:¹Ù·½ÎÄµµÉÏÐ´µÄÊÇvarint£¬ÆäÊµÓ¦¸ÃÊÇshort
+			//int PKL=readVarInt(di); <--WARNING:éŽè§„É‘éŒç†¼å¼¬é¥ã„£ï¿½å‚›ç¨‰æ¿ å‚šæ™¸é–»ã„¥å«­å¦²ç«©arinté–¿æ¶˜è‹¯é™å‰§ï¿½åœ­å›ç»¨èŒ¬æ‹ éŠ‰ï¸½Ð¦short
 			int PKL=di.readShort();
 			byte[] PK=new byte[PKL];
 			di.readFully(PK);
 			
-			int VTL=di.readShort();//<--WARNING:¹Ù·½ÎÄµµÉÏÐ´µÄÊÇvarint£¬ÆäÊµÓ¦¸ÃÊÇshort,¹Ù·½ÎÄµµÕæµÄ²»¿¿Æ×
+			int VTL=di.readShort();//<--WARNING:éŽè§„É‘éŒç†¼å¼¬é¥ã„£ï¿½å‚›ç¨‰æ¿ å‚šæ™¸é–»ã„¥å«­å¦²ç«©arinté–¿æ¶˜è‹¯é™å‰§ï¿½åœ­å›ç»¨èŒ¬æ‹ éŠ‰ï¸½Ð¦short,éŽè§„É‘éŒç†¼å¼¬é¥ã„£ï¿½å‚žæƒ‡é”çƒ˜ç•±å¨‘æ’³ç§¹å¨¼î„‚æ‹«é”Ÿï¿½
 			byte[] VT=new byte[VTL];
 			di.readFully(VT);
 			
@@ -51,60 +51,60 @@
 				println(1,"Login Success!");
 			}
 			
-			//ÏÂÃæÊÇ1.12.2Ð­ÒéµÄÊý¾Ý°ü
+			//å¨‘æ’³îƒ‰å¨¼ä¼´å¼°é”Ÿï¿½1.12.2é–¸æ¥€ç¹—é¡”å‘´æƒƒé•î„æ®¶é–¹è¯¡å––ç€µï¿½
 			else if(ri.id==0x03) {
-							cfg.println(name,2,"·þÎñÆ÷ÒªÇóÆôÓÃÑ¹Ëõ...");
+							cfg.println(name,2,"é–ºå ç§´æ¿®ç†¼å´³éŠŠîŸ‘æ´£æ¿®ç‘°å€¸éŽ¯åº¨æ‚½éŠŠãƒ¥ç«¾ç¼‚å‚¦æ‹·...");
 							int value=ri.readVarInt();
-							cfg.println(name,2,"Ñ¹ËõÇ°×î´óÊý¾Ý°ü´óÐ¡:"+value+"byte");
+							cfg.println(name,2,"é–¸æ¨ºîƒ‡ç¼‚å¤å´œå®¥å—˜ä»˜å©¢å †å‹¬æ®¶é–¹è¯¡å––ç€µæ¨»å¾„è¤é¨ï¿½:"+value+"byte");
 							maxPackSize=value;
 							compression=true;
 						}
 			else if(ri.id==0x01) {//
-							cfg.println(name, 1,"·þÎñÆ÷²ú³ö¾­Ñé\n");
-							cfg.println(name,1,"ÊµÌåid:"+ri.readVarInt()+"\t×ø±ê:\n");
+							cfg.println(name, 1,"é–ºå ç§´æ¿®ç†¼å´³éŠŠã‚‰ç“é–¸æˆ£æ«£ç»®â„ƒîš¥ç€›ç¸©");
+							cfg.println(name,1,"éŽåœ­å˜ç¼åª”d:"+ri.readVarInt()+"\té–¸Ñ„åŠ–é–ï¿½:\n");
 						
 										"x:"+ri.readDouble()+"\ty:"+ri.readDouble()+"\tz:"+ri.readDouble()+"\n"+
-										"ÊýÁ¿:"+ri.readShort());
+										"é–ºä½·å³é£ï¿½:"+ri.readShort());
 							
 						}
 						else if(ri.id==0x18) {
 							String name=ri.readString();
 							byte[] data=ri.getAllData();
-							cfg.println(this.name, 2,"½ÓÊÕµ½·þÎñ¶ËµÄ²å¼þÐÅÏ¢\n"+
-										"²å¼þÃû×Ö:"+name+"\tÊý¾Ý:"+Arrays.toString(data)+"\n"+
-										"×ª»»ÎªÎÄ±¾:"+new String(data));
+							cfg.println(this.name, 2,"é–¹æ’å„²éå½’å´šé—å Ÿç®›é–¸æ—“ç´•é¡î„„æƒƒé•î„€çµ»å¨´çŠ³æ¹¹æ·‡å©‡å¹é¥åª™"+
+										"é–¹ç»˜å¸Šå¨†ãˆ¤å´¥å®¥å‘¯æ‘Ÿ:"+name+"\té–ºä½ºå¢—å®“ï¿½:"+Arrays.toString(data)+"\n"+
+										"é‰çƒ†å‰šå®•å‰ç¨‰é‘æ¨»ç€®é–ºå ¬æ‹·:"+new String(data));
 							
 						}else if(ri.id==0x0d) {
 							int dif=ri.readUnsignedByte();
-							String text="Î´Öª:"+dif;
+							String text="é–ºå «äºžé“ï¿½:"+dif;
 							if(dif==0)
-								text="ºÍÆ½";
+								text="é–¸æ»ƒè‹¯é–½ï¿½";
 							if(dif==1)
-								text="¼òµ¥";
+								text="ç¼ç‹…æ‹·é–¸æ¥‹æ‹·";
 							if(dif==2)
-								text="ÆÕÍ¨";
+								text="é–ºå’å™£é”Ÿæ–¤æ‹·";
 							if(dif==3)
-								text="À§ÄÑ";
-							cfg.println(this.name,2,"·þÎñ¶ËÒªÇó¸ü¸ÄÄÑ¶È:"+text);
+								text="é–¸ãƒ¤å³å§£ï¿½";
+							cfg.println(this.name,2,"é–ºå ç§´æ¿®ç†ºç²©é¡–æ¿æ´£æ¿®ç‘°å€¹å¨²å—å¼¨è¤°æŽ“î‡›éŽ¼è¾¾æ‹·:"+text);
 						}else if(ri.id==0x2c) {
 							byte nl=ri.readByte();
-							cfg.println(name, 2, "ÄãÓµÓÐÕâÐ©ÄÜÁ¦:"+nl+"\n"+
-										"·ÉÐÐËÙ¶È:"+ri.readFloat()+"\tÊÓÒ°:"+ri.readFloat());
+							cfg.println(name, 2, "å¨´ï½‡å§µç€šãˆ¤å¼µæ¾¶åº£ç®¹å¨´æ»„ç¨–éæ©€å´é”Ÿï¿½:"+nl+"\n"+
+										"å¦žå¬¬å é¡¢æˆ¦æŸ…é”å³°î†Š:"+ri.readFloat()+"\téŸæ¬æ£é£ï¿½:"+ri.readFloat());
 						}else if(ri.id==0x3a) {
 							byte num=ri.readByte();
-							cfg.println(name, 1,"ÎïÆ·À¸Ñ¡ÏîË÷ÒýÒÑ¸üÐÂ:"+num);
+							cfg.println(name, 1,"é–»æ¤»æ™›éŽ¼Ñ‡å¼½è¹‡æ¶³æ‹·æ¾¶æ„©ï¿½å¶‡æ§éŠçŠµç©¿ç€¹ç¨¿å¼¶å¨²å—å¼¬é”Ÿï¿½:"+num);
 						}else if(ri.id==0x1b) {
-							cfg.println(name,1, "ÊµÌå×´Ì¬±»¸Ä±ä\n"+
-										"ÊµÌåid:"+ri.readInt()+"\t¸ü¸Äºó×´Ì¬:"+ri.readByte());
-						}else if(ri.id==0x31) {//½âËøºÏ³É
+							cfg.println(name,1, "éŽåœ­å˜ç¼å¬®æ‚©é‘¸ç¢‰æ‹·æµ£ç­‹æ½¶é–ºï¿½éŸæ¿ç¶\n"+
+										"éŽåœ­å˜ç¼åª”d:"+ri.readInt()+"\té–ºå›§ç“¨éå¥¸å´¥æ´ï½…Ð¦é–¹î„Šæ‹·:"+ri.readByte());
+						}else if(ri.id==0x31) {//éŸæ¬™ç¶é€ï½‰å´¥é«ç†·ç‡
 							int action=ri.readVarInt();
-							String actionText="Î´Öª";
+							String actionText="é–ºå «äºžé“ï¿½";
 							if(action==0)
-								actionText="ÉèÖÃ";
+								actionText="é ä½¸å¢½é¤ï¿½";
 							if(action==1)
-								actionText="Ìí¼Ó";
+								actionText="æ¿žï½ˆî‡§æ¿®ï¿½";
 							if(action==2)
-								actionText="É¾³ý";
+								actionText="é–¸æŽ”å¨€å¨…ï¿½";
 							boolean bool1=ri.readBoolean();
 							boolean bool2=ri.readBoolean();
 							int[] array1=new int[ri.readVarInt()];
@@ -116,63 +116,63 @@
 								for(int i=0;i<array2.length;i++) {
 									array2[i]=ri.readVarInt();
 								}
-								cfg.println(name, 1,"½âËøºÏ³É(ÏÂÃæµÄÐÅÏ¢ÓÉÓÚ²»ÖªµÀÈçºÎ·­Òë£¬ËùÒÔ¶¼ÊÇÓ¢ÎÄ)\n"+
+								cfg.println(name, 1,"éŸæ¬™ç¶é€ï½‰å´¥é«ç†·ç‡(å¨‘æ’³îƒ‰å¨¼ä¼´æƒƒé•îƒç¹†é–¹î…§åž³éè¾¨ç¦æ´æ¿ˆç‘é–»î…œå„µæµœç‚¬ä¿ŠéŒæ¬‘ç§¿ç¼‚å Ÿæ§’é¦Ñ‡æ•çžæƒ§î•²å¨´çŠ®å„µéæ©€å¼°é¡–æ¿†î°é–ºå‚¦æ‹·)\n"+
 											"action:"+actionText+"\tCrafting Book Open"+bool1+"\tFiltering Craftable:"+bool2+"\n"+
 											"Recipe IDs1:\n"+Arrays.toString(array1)+"\n"+
 											"Recipe IDs2:\n"+Arrays.toString(array2));
 								continue;
 							}
-							cfg.println(name, 1,"½âËøºÏ³É(ÏÂÃæµÄÐÅÏ¢ÓÉÓÚ²»ÖªµÀÈçºÎ·­Òë£¬ËùÒÔ¶¼ÊÇÓ¢ÎÄ)\t"+
+							cfg.println(name, 1,"éŸæ¬™ç¶é€ï½‰å´¥é«ç†·ç‡(å¨‘æ’³îƒ‰å¨¼ä¼´æƒƒé•îƒç¹†é–¹î…§åž³éè¾¨ç¦æ´æ¿ˆç‘é–»î…œå„µæµœç‚¬ä¿ŠéŒæ¬‘ç§¿ç¼‚å Ÿæ§’é¦Ñ‡æ•çžæƒ§î•²å¨´çŠ®å„µéæ©€å¼°é¡–æ¿†î°é–ºå‚¦æ‹·)\t"+
 									"action:"+actionText+"\tCrafting Book Open"+bool1+"\tFiltering Craftable:"+bool2+"\n"+
 									"Recipe IDs1:\n"+Arrays.toString(array1)+"\n"+
-									"Recipe IDs2:\n²»´æÔÚ");
+									"Recipe IDs2:\nå¨‘æ’³ç§´é¡ã„©å´·é”Ÿï¿½");
 						}else if(ri.id==0x2e) {
 							int action=ri.readVarInt();
 							int playNum=ri.readVarInt();
-							String status="Î´Öª";
+							String status="é–ºå «äºžé“ï¿½";
 							if(action==0)
-								status="ÐÂÔöÍæ¼Ò";
+								status="é–ºå‚›æ¾˜é¡¤å†®æ‚³éˆºä¾‡å•€";
 							if(action==1)
-								status="¸üÐÂÓÎÏ·Ä£Ê½";
+								status="é–ºå›§ç“¨éŒå©‚ã€’é›å©‚ç†æ¿¡îˆ—ï¿½å´‡ç¡€";
 							if(action==2)
-								status="¸üÐÂÑÓ³Ù";
+								status="é–ºå›§ç“¨éŒå©‚î‡™éŽ¯æ‰®ç®¿";
 							if(action==3)
-								status="¸üÐÂÃû³Æ";
+								status="é–ºå›§ç“¨éŒå©‡å´¥å®¥å›†ï¿½";
 							if(action==4)
-								status="É¾³ýÍæ¼Ò";
-							String msg="Íæ¼ÒÁÐ±í¸üÐÂ:"+status;
+								status="é–¸æŽ”å¨€å¨…åº¨æ‚³éˆºä¾‡å•€";
+							String msg="é–»æº¾æ™›é¡”å¶‰å´šå¦¤å‹©ï¿½å†®å¼´ç€›æ¨»ç…€:"+status;
 							for(int i=0;i<playNum;i++) {
 								byte[] uuid=new byte[16];
 								ri.readFully(uuid);
 								msg+="\nuuid:"+Arrays.toString(uuid);
 								if(action==0) {
-									msg+="\nÍæ¼ÒÃû:"+ri.readString();
+									msg+="\né–»æº¾æ™›é¡”å¶‰å´¥é”Ÿï¿½:"+ri.readString();
 									int num=ri.readVarInt();
 									for(int a=0;a<num;a++) {
-										msg+="\nÊôÐÔÃû:"+ri.readString();
-										msg+="\tÊôÐÔÖµ:"+ri.readString();
+										msg+="\néç‚µåžé”Ÿçª–å†©å€³:"+ri.readString();
+										msg+="\téç‚µåžé”Ÿçª–å†¿æ‹·é”Ÿï¿½:"+ri.readString();
 										boolean sign=ri.readBoolean();
-										msg+="\tÊÇ·ñÇ©Ãû:"+sign;
+										msg+="\té–ºå‹µåž°éŽ¯ä½ºç²µéŽ¯Ñ„å€³:"+sign;
 										if(sign) {
-											msg+="\tÇ©Ãû:"+ri.readString();
+											msg+="\tç¼æ¶™å„³éŽ®ï¿½:"+ri.readString();
 										}
 									}
-									msg+="\nÓÎÏ·Ä£Ê½:"+ri.readVarInt();
-									msg+="\tÑÓ³Ù:"+ri.readVarInt()+"ms";
+									msg+="\næ¿žæ’³æ†¡é¨æ¬ÎŸéˆ¥å´‡ç¡€:"+ri.readVarInt();
+									msg+="\tç€µã‚†å„¼ç»»ï¿½:"+ri.readVarInt()+"ms";
 									if(ri.readBoolean())
-										msg+="\tÏÔÊ¾Ãû³Æ:\n"+ri.readString();
+										msg+="\té–ºå‹«å¢½éŠ‡æ°¶å´¥å®¥å›†ï¿½:\n"+ri.readString();
 								}
 								if(action==1) {
-									msg+="\nÓÎÏ·Ä£Ê½:"+ri.readVarInt();
+									msg+="\næ¿žæ’³æ†¡é¨æ¬ÎŸéˆ¥å´‡ç¡€:"+ri.readVarInt();
 								}
 								if(action==2) {
-									msg+="\nÑÓ³Ù:"+ri.readVarInt()+"ms";
+									msg+="\nç€µã‚†å„¼ç»»ï¿½:"+ri.readVarInt()+"ms";
 								}
 								if(action==3) {
 									boolean bool=ri.readBoolean();
-									msg+="\nÊÇ·ñ´æÔÚÏÔÊ¾Ãû³Æ:"+bool;
+									msg+="\né–ºå‹µåž°éŽ¯ä½ºï¿½æ¶™Ãªå©€îˆå¼°é“Ñä»›é–¸æ°¬ç§¶è¢¨:"+bool;
 									if(bool)
-										msg+="\tÏÔÊ¾Ãû³Æ:\n"+ri.readString();
+										msg+="\té–ºå‹«å¢½éŠ‡æ°¶å´¥å®¥å›†ï¿½:\n"+ri.readString();
 								}
 								msg+="\n"+"--------------------------------------------------------";
 							}

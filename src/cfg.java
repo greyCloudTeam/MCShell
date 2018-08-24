@@ -57,7 +57,7 @@ public class cfg {
 
 	public static void jumpView(String id) {
 		if(!allView.containsKey(id)) {
-			println(3,"ÊÓÍ¼²»´æÔÚ");
+			println(3,"è§†å›¾ä¸å­˜åœ¨");
 			commandStop=false;
 			return;
 		}
@@ -105,8 +105,8 @@ public class cfg {
 			di=new DataInputStream(is);
 			os=s.getOutputStream();
 			dos=new DataOutputStream(os);
-			cfg.println(1,"³É¹¦Á¬½Ó·şÎñÆ÷£¡");
-			cfg.println(1,"×¼±¸Êı¾İ°ü....");
+			cfg.println(1,"æˆåŠŸå»ºç«‹è¿æ¥...");
+			cfg.println(1,"å‘é€è·å–motdè¯·æ±‚....");
 			
 			sendPack hand=new sendPack(dos,0x00);
 			hand.writeVarInt(-1);
@@ -123,24 +123,24 @@ public class cfg {
 			dos.write(pack.b.toByteArray());
 
 			dos.flush();
-			cfg.println(1,"ÒÑ·¢ËÍ£¬µÈ´ı·şÎñÆ÷µÄÏìÓ¦....");
+			cfg.println(1,"å·²å‘é€ï¼Œæ­£åœ¨ç­‰å¾…æœåŠ¡ç«¯çš„å“åº”....");
 			
 			acceptPack ri=new acceptPack(di,false);
-			println(1, "½ÓÊÕµ½Êı¾İ°ü\n³¤¶È:"+ri.data.length+"\tid:"+ri.id);
+			println(1, "æ¥æ”¶åˆ°æ•°æ®ï¼Œé•¿åº¦:"+ri.data.length+"ï¼Œid:"+ri.id);
 			if(ri.id!=0x00) {
-				throw new RuntimeException("´íÎóµÄid");
+				throw new RuntimeException("æ”¶åˆ°çš„æ•°æ®åŒ…ä¸æ­£ç¡®ï¼");
 			}
 			String motdT=ri.readString();
 			cfg.println(1,"-----------------------------------------------------------------------------");
 			JsonParser json=new JsonParser();
             JsonElement part5 = json.parse(motdT);
             JsonElement part6=part5.getAsJsonObject().get("version");
-            cfg.println(1,"·şÎñ¶ËĞÅÏ¢:"+part6.getAsJsonObject().get("name").getAsString());
-            cfg.println(1,"Ğ­Òé°æ±¾ºÅ:"+part6.getAsJsonObject().get("protocol").getAsInt());
+            cfg.println(1,"æœåŠ¡ç«¯ä¿¡æ¯:"+part6.getAsJsonObject().get("name").getAsString());
+            cfg.println(1,"åè®®ç‰ˆæœ¬å·:"+part6.getAsJsonObject().get("protocol").getAsInt());
             
             JsonElement part1=part5.getAsJsonObject().get("players");
-            cfg.println(1,"×î´óÈËÊı:"+part1.getAsJsonObject().get("max").getAsInt());
-            cfg.println(1,"ÔÚÏßÍæ¼ÒÊı:"+part1.getAsJsonObject().get("online").getAsInt());
+            cfg.println(1,"æœ€å¤§äººæ•°:"+part1.getAsJsonObject().get("max").getAsInt());
+            cfg.println(1,"åœ¨çº¿äººæ•°:"+part1.getAsJsonObject().get("online").getAsInt());
             String player="";
             JsonElement temp=part1.getAsJsonObject().get("sample");
             if(temp!=null) {
@@ -156,9 +156,9 @@ public class cfg {
                     point++;
                     //System.out.print(+",");
                 }
-                cfg.println(1,"Íæ¼ÒÁĞ±í(½öÏÔÊ¾Ç°10Ãû):\n"+player);
+                cfg.println(1,"ç©å®¶åˆ—è¡¨(ä»…æ˜¾ç¤ºå‰10ä¸ªç©å®¶):\n"+player);
             }else {
-            	cfg.println(2,"\tÍæ¼ÒÁĞ±í²»´æÔÚ»òÃ»ÓĞÍæ¼Ò");
+            	cfg.println(2,"\tç©å®¶åˆ—è¡¨ä¸å­˜åœ¨");
             }
             
             //println(1,"description:"+) <-WARNING!!!!!!!
@@ -177,22 +177,22 @@ public class cfg {
 			dos.flush();
 			
 			acceptPack ri=new acceptPack(di,false);
-			println(1, "½ÓÊÕµ½Êı¾İ°ü\n³¤¶È:"+ri.data.length+"\tid:"+ri.id);
+			println(1, "æ¥æ”¶åˆ°æ•°æ®åŒ…ï¼Œé•¿åº¦:"+ri.data.length+"ï¼Œid:"+ri.id);
 			if(ri.id!=0x01) {
-				throw new RuntimeException("´íÎóµÄid");
+				throw new RuntimeException("æ¥æ”¶åˆ°çš„æ•°æ®åŒ…ä¸æ­£ç¡®ï¼");
 			}
-			cfg.println(1,"·şÎñÆ÷ÑÓ³Ù,"+(System.currentTimeMillis()-ri.readLong())+"ms");
+			cfg.println(1,"æœåŠ¡å™¨å»¶è¿Ÿ,"+(System.currentTimeMillis()-ri.readLong())+"ms");
 		}catch(RuntimeException e) {
 			e.printStackTrace();
 		}catch(Exception e) {
-			cfg.println(2,"·şÎñÆ÷ÓĞ¿ÉÄÜ½ûÖ¹ÁËping");
+			cfg.println(2,"æœåŠ¡ç«¯å¯èƒ½ç¦æ­¢äº†ping");
 		}
 		
-		cfg.println(1,"Íê³É!");
+		cfg.println(1,"å®Œæˆï¼");
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
-			// TODO ×Ô¶¯Éú³ÉµÄ catch ¿é
+			// TODO é–¼å¥‰äºœæ¿®â•…æ‚½é”ç¨¿ç‡é–»îŸ’æ‹· catch é–¸Ñæ‹·
 			e.printStackTrace();
 		}
 		cfg.commandStop=false;

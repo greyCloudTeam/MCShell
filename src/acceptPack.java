@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class acceptPack {
 	public byte[] data=null;
 	public int id=-1;
-	public int point=0;//当前位置，读数据的时候也要包括这个
+	public int point=0;
 	private static ByteBuffer buffer = ByteBuffer.allocate(8); 
 	public byte[] thenData=null;
 	public acceptPack(byte[] data) {
@@ -16,7 +16,6 @@ public class acceptPack {
 		try {
 			id=readVarInt();
 		} catch (IOException e) {
-			// TODO 自动生成的 catch 块
 			e.printStackTrace();
 		}
 	}
@@ -36,7 +35,11 @@ public class acceptPack {
 			}
 			id=readVarInt();
 	}
-	public String readString() {//有了这个就方便多了
+	public int readIntA() {
+		double a=readDouble();
+		return (int)(a*32.0D);
+	}
+	public String readString() {
 		String re="";
 		try {
 			int length=readVarInt();
@@ -44,13 +47,12 @@ public class acceptPack {
 			readFully(by);
 			re=new String(by);
 		} catch (IOException e) {
-			// TODO 自动生成的 catch 块
 			e.printStackTrace();
 		}
 		return re;
 	}
 	public byte[] getAllData() {
-		byte[] data=new byte[this.data.length-point];//0-24 0-10 14``
+		byte[] data=new byte[this.data.length-point];
 		readFully(data);
 		return data;
 	}
@@ -95,16 +97,8 @@ public class acceptPack {
 		readFully(temp);
 		return byte2float(temp);
 	}
-	/**
-	 * 字节转换为浮点
-	 * 
-	 * @param b 字节（至少4个字节）
-	 * @param index 开始位置
-	 * @return
-	 */
 	public static float byte2float(byte[] b) {  
-		ByteBuffer buf=ByteBuffer.allocateDirect(4); //无额外内存的直接缓存
-		//buf=buf.order(ByteOrder.LITTLE_ENDIAN);//默认大端，小端用这行
+		ByteBuffer buf=ByteBuffer.allocateDirect(4);
 		buf.put(b);
 		buf.rewind();
 		float f2=buf.getFloat();       
@@ -129,7 +123,7 @@ public class acceptPack {
     }
 	public static short byteToShort(byte[] b) {
         short s = 0;
-        short s0 = (short) (b[0] & 0xff);// 最低位
+        short s0 = (short) (b[0] & 0xff);
         short s1 = (short) (b[1] & 0xff);
         s1 <<= 8;
         s = (short) (s0 | s1);

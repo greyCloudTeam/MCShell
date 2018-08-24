@@ -10,10 +10,10 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;  
 import java.util.zip.InflaterInputStream;  
 
-//ZLibÑ¹Ëõ¹¤¾ß 
+//ZLibé–¸æ¨ºîƒ‡ç¼‚å¤Šî†éŠ‰ãƒ¥å¾” 
 public class ZLibUtils {  
 
-    //Ñ¹ËõÖ±½ÓÊı×é 
+    //é–¸æ¨ºîƒ‡ç¼‚å¤æƒ„ç€›æ¨ºå¤é–ºä½¹å£†ç»®ï¿½ 
     public static byte[] compress(byte[] data) {  
         byte[] output = new byte[0];  
 
@@ -44,7 +44,7 @@ public class ZLibUtils {
         return output;  
     }  
 
-    //Ñ¹Ëõ ×Ö½ÚÊı×éµ½Êä³öÁ÷
+    //é–¸æ¨ºîƒ‡ç¼‚ï¿½ éæ¶™îš‰æ¿¡î…¢å¼«éµî†¾çŸ‹é–¸æ“åª½ç»¶î…¢å´™é‘æ¨¼ã‚¦
     public static void compress(byte[] data, OutputStream os) {  
         DeflaterOutputStream dos = new DeflaterOutputStream(os);  
 
@@ -59,7 +59,7 @@ public class ZLibUtils {
         }  
     }  
 
-    //½âÑ¹Ëõ ×Ö½ÚÊı×é
+    //éŸæ¬™çµ½ç”¯å›©ç´“é”Ÿï¿½ éæ¶™îš‰æ¿¡î…¢å¼«éµî†¾çŸ‹
     public static byte[] decompress(byte[] data) {  
         byte[] output = new byte[0];  
 
@@ -90,7 +90,7 @@ public class ZLibUtils {
         return output;  
     }  
 
-    //½âÑ¹Ëõ ÊäÈëÁ÷ µ½×Ö½ÚÊı×é
+    //éŸæ¬™çµ½ç”¯å›©ç´“é”Ÿï¿½ é‰å ŸæŒ¸é™å——Ã¹é”Ÿï¿½ é–¸æ“æ¾˜é¡Ñ‡æ‡éŒæ¶™æ®¶ç¼‚ä¾Šæ‹·
     public static byte[] decompress(InputStream is) {  
         InflaterInputStream iis = new InflaterInputStream(is);  
         ByteArrayOutputStream o = new ByteArrayOutputStream(1024);  

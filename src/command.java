@@ -23,26 +23,26 @@ public class command extends Thread {
 			try {
 				event(c);
 			} catch (InterruptedException | IOException e) {
-				// TODO ×Ô¶¯Éú³ÉµÄ catch ¿é
+				// TODO é–¼å¥‰äºœæ¿®â•…æ‚½é”ç¨¿ç‡é–»îŸ’æ‹· catch é–¸Ñæ‹·
 				e.printStackTrace();
 			}
 		}
 	}
 	public void event(String[] c) throws InterruptedException, IOException {
 		if(c[0].equals("help")) {
-			cfg.println(1, "°ïÖúĞÅÏ¢£¬ÏÂÃæµÄÊÇMCShellµÄÈ«²¿ÃüÁî:\n"+
-						"listPing +ip +port:»ñÈ¡Ä¿±ê·şÎñÆ÷µÄĞÅÏ¢\n"+
-						"login +ip +port +versionNum(Äã¿ÉÒÔÊ¹ÓÃ \"listPing\" À´»ñÈ¡Ğ­Òé°æ±¾ºÅ£¬×¢Òâ£¬Õâ²»ÊÇ°æ±¾£¬ÊÇĞ­Òé°æ±¾ºÅ):µÇÂ½Ò»¸ö·şÎñÆ÷£¬Èç¹ûµÇÂ½³É¹¦£¬»á·µ»ØÒ»¸ö±êÊ¶£¬Ä¬ÈÏÊ¹ÓÃMCShellÓÃ»§Ãû\n"+
-						"setUsername +username:ÉèÖÃÄ¬ÈÏµÇÂ½µÄÓÃ»§Ãû\n"+
-						"in +token(Í¨¹ı \"login\" À´»ñµÃµÄ±êÊ¶,»òÕßÊÇmain,¼´Ö÷ÊÓÍ¼):ÇĞ»»ÊÓÍ¼\n"+
-						"hide:Òş²Øµ±Ç°ÊÓÍ¼µÄÃüÁîÌáÊ¾·û\n"+
-						"show:ÏÔÊ¾µ±Ç°ÊÓÍ¼µÄÃüÁîÌáÊ¾·û\n"+
-						"fuck:Ïú»Ùµ±Ç°ÊÓÍ¼£¬²¢ÍË³öµ½¿ªÊ¼½çÃæ(»áÇ¿ÖÆÖĞ¶ÏÓë·şÎñÆ÷µÄÁ¬½Ó)");
+			cfg.println(1, "ä¸‹é¢æ˜¯MCShellçš„å…¨éƒ¨å‘½ä»¤:\n"+
+						"listPing +ip +port:è·å–ä¸€ä¸ªæœåŠ¡å™¨çš„ä¿¡æ¯\n"+
+						"login +ip +port +versionNum(ä½ éœ€è¦é€šè¿‡ \"listPing\" å‘½ä»¤æ¥è·å–ï¼Œæ³¨æ„ï¼Œä¸æ˜¯æ¸¸æˆç‰ˆæœ¬ï¼Œæ˜¯åè®®ç‰ˆæœ¬):ç™»é™†ä¸€ä¸ªæœåŠ¡å™¨ï¼Œæ‰§è¡Œå®Œæ¯•åä¼šåˆ›å»ºä¸€ä¸ªè§†å›¾\n"+
+						"setUsername +username:è®¾ç½®MCShellç™»é™†æ¸¸æˆæ—¶çš„ç”¨æˆ·å\n"+
+						"in +token(é€šè¿‡ \"login\" å‘½ä»¤åˆ›å»ºè§†å›¾åè¾“å‡ºçš„è§†å›¾id):åˆ‡æ¢è§†å›¾\n"+
+						"hide:éšè—å‘½ä»¤æç¤ºç¬¦\n"+
+						"show:æ˜¾ç¤ºå‘½ä»¤æç¤ºç¬¦\n"+
+						"fuck:é”€æ¯å½“å‰è§†å›¾");
 		}else if(c[0].equals("")){
 			
 		}else if(c[0].equals("show")) {
 			if(main.path.equals("View-Main")) {
-				cfg.println(3, "²»ÄÜÔÚmainÊÓÍ¼ÖĞÊ¹ÓÃÕâ¸öÃüÁî");
+				cfg.println(3, "ä¸èƒ½åœ¨Mainè§†å›¾ä¸­ä½¿ç”¨æ­¤å‘½ä»¤");
 				Thread.sleep(100);
 				cfg.commandStop=false;
 				return;
@@ -50,7 +50,7 @@ public class command extends Thread {
 			cfg.allView.get(main.path).showC=true;
 		}else if(c[0].equals("hide")) {
 			if(main.path.equals("View-Main")) {
-				cfg.println(3, "²»ÄÜÔÚmainÊÓÍ¼ÖĞÊ¹ÓÃÕâ¸öÃüÁî");
+				cfg.println(3, "ä¸èƒ½åœ¨Mainè§†å›¾ä¸­ä½¿ç”¨æ­¤å‘½ä»¤");
 				Thread.sleep(100);
 				cfg.commandStop=false;
 				return;
@@ -58,7 +58,7 @@ public class command extends Thread {
 			cfg.allView.get(main.path).showC=false;
 		}else if(c[0].equals("fuck")) {
 			if(main.path.equals("View-Main")) {
-				cfg.println(3, "²»ÄÜÔÚmainÊÓÍ¼ÖĞÊ¹ÓÃÕâ¸öÃüÁî");
+				cfg.println(3, "ä¸èƒ½åœ¨Mainè§†å›¾ä¸­ä½¿ç”¨æ­¤å‘½ä»¤");
 				Thread.sleep(100);
 				cfg.commandStop=false;
 				return;
@@ -74,29 +74,29 @@ public class command extends Thread {
 			return;
 		}else if(c[0].equals("listPing")){
 			if(!main.path.equals("View-Main")) {
-				cfg.println(3, "²»ÄÜÔÚ·ÇmainÊÓÍ¼ÖĞÊ¹ÓÃÕâ¸öÃüÁî");
+				cfg.println(3, "ä¸èƒ½åœ¨éMainè§†å›¾ä¸­ä½¿ç”¨æ­¤å‘½ä»¤");
 				Thread.sleep(100);
 				cfg.commandStop=false;
 				return;
 			}
 			if(c.length!=3) {
-				cfg.println(3, "´«µİµÄ²ÎÊı²»ÕıÈ·");
+				cfg.println(3, "ä¼ é€’çš„å‚æ•°æ•°é‡ä¸æ­£ç¡®");
 				Thread.sleep(100);
 				cfg.commandStop=false;
 				return;
 			}
-			cfg.println(1, "ÇëµÈ´ı....");
+			cfg.println(1, "è¯·ç­‰å¾…....");
 			cfg.pingList(c[1],c[2]);
 			return;
 		}else if(c[0].equals("setUsername")) {
 			if(!main.path.equals("View-Main")) {
-				cfg.println(3, "²»ÄÜÔÚ·ÇmainÊÓÍ¼ÖĞÊ¹ÓÃÕâ¸öÃüÁî");
+				cfg.println(3, "ä¸èƒ½åœ¨éMainè§†å›¾ä¸­ä½¿ç”¨æ­¤å‘½ä»¤");
 				Thread.sleep(100);
 				cfg.commandStop=false;
 				return;
 			}
 			if(c.length!=2) {
-				cfg.println(3, "´«µİµÄ²ÎÊı²»ÕıÈ·");
+				cfg.println(3, "ä¼ é€’çš„å‚æ•°æ•°é‡ä¸æ­£ç¡®");
 				Thread.sleep(100);
 				cfg.commandStop=false;
 				return;
@@ -104,31 +104,31 @@ public class command extends Thread {
 			cfg.username=c[1];
 		}else if(c[0].equals("login")) {
 			if(!main.path.equals("View-Main")) {
-				cfg.println(3, "²»ÄÜÔÚ·ÇmainÊÓÍ¼ÖĞÊ¹ÓÃÕâ¸öÃüÁî");
+				cfg.println(3, "ä¸èƒ½åœ¨éMainè§†å›¾ä¸­ä½¿ç”¨æ­¤å‘½ä»¤");
 				Thread.sleep(100);
 				cfg.commandStop=false;
 				return;
 			}
 			if(c.length!=4) {
-				cfg.println(3, "´«µİµÄ²ÎÊı²»ÕıÈ·");
+				cfg.println(3, "ä¼ é€’çš„å‚æ•°æ•°é‡ä¸æ­£ç¡®");
 				Thread.sleep(100);
 				cfg.commandStop=false;
 				return;
 			}
-			cfg.println(1, "ÇëµÈ´ı....");
+			cfg.println(1, "è¯·ç­‰å¾…....");
 			View n=new View();
 			n.ip=c[1];
 			n.port=Integer.parseInt(c[2]);
 			n.version=Integer.parseInt(c[3]);
 			n.name="View-"+(cfg.allViewNum+1);
-			cfg.println(2,"³É¹¦´´½¨ÊÓÍ¼£¬id:"+(cfg.allViewNum+1)+"£¬ÇëÊ¹ÓÃ\"in\"ÃüÁîÀ´ÇĞ»»ÊÓÍ¼£¬ÊÓÍ¼Ä¬ÈÏÎªÒş²ØÃüÁîÌáÊ¾·û£¬ÇëÊäÈëshowÀ´È¡ÏûÒş²Ø");
+			cfg.println(2,"æˆåŠŸåˆ›å»ºè§†å›¾ï¼Œè§†å›¾id:"+(cfg.allViewNum+1)+"è¯·ä½¿ç”¨\"in\"å‘½ä»¤æ¥åˆ‡æ¢è§†å›¾ï¼Œè¿›å…¥è§†å›¾åå‘½ä»¤æç¤ºç¬¦å¯èƒ½æ˜¯éšè—çš„ï¼Œä½ å¯ä»¥è¾“å…¥ \"show\" å‘½ä»¤æ¥æ˜¾ç¤ºå‘½ä»¤æç¤ºç¬¦");
 			cfg.allView.put(n.name, n);
 			n.start();
 			cfg.allViewNum++;
 			return;
 		}else if(c[0].equals("in")){
 			if(c.length!=2) {
-				cfg.println(3, "´«µİµÄ²ÎÊı²»ÕıÈ·");
+				cfg.println(3, "ä¼ é€’çš„å‚æ•°æ•°é‡ä¸æ­£ç¡®");
 				Thread.sleep(100);
 				cfg.commandStop=false;
 				return;
@@ -150,7 +150,7 @@ public class command extends Thread {
 			cfg.jumpView("View-"+c[1]);
 			return;
 		}else{
-			cfg.println(3, "Î´ÖªµÄÃüÁî \""+c[0]+"\"");
+			cfg.println(3, "æœªçŸ¥çš„å‘½ä»¤\""+c[0]+"\"");
 		}
 		Thread.sleep(100);
 		cfg.commandStop=false;
