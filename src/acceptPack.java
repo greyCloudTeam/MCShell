@@ -4,6 +4,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Iterator;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 public class acceptPack {
 	public byte[] data=null;
@@ -112,10 +117,9 @@ public class acceptPack {
 		return Double.longBitsToDouble(value);
 	}
 	public static long bytesToLong(byte[] bytes) {
-		buffer.clear();
-        buffer.put(bytes, 0, bytes.length);
-        buffer.flip();//need flip 
-        return buffer.getLong();
+		// 将byte[] 封装为 ByteBuffer 
+        ByteBuffer buffer = ByteBuffer.wrap(bytes,0,8);
+        return buffer.getLong();  
     }
 	public static byte[] longToBytes(long x) {
         buffer.putLong(0, x);
@@ -180,5 +184,29 @@ public class acceptPack {
 			by[i]=readByte();
 		}
 	}
-	
+	public static double int2FPN(int value) {
+		return (double)(value / 32.0D);
+	}
+	public static double byte2FPN(byte value) {
+		return (double)(value / 32.0D);
+	}
+	public static String toChat(String data) {
+		String value="";
+		JsonParser json=new JsonParser();
+        JsonElement part5 = json.parse(data);
+        JsonElement temp=part5.getAsJsonObject().get("extra");
+        if(temp!=null) {
+        	JsonArray part7=temp.getAsJsonArray();
+            Iterator it=part7.iterator();
+            while(it.hasNext()){
+                JsonElement e = (JsonElement)it.next();
+                try{
+                	value+=e.getAsJsonObject().get("text").getAsString();
+                }catch(Exception err) {
+                	value+=e.getAsString();
+                }
+            }
+        }
+        return value;
+	}
 }

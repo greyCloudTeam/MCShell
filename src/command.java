@@ -7,19 +7,19 @@ public class command extends Thread {
 	@Override
 	public void run() {
 		//先执行command。mcs的命令
-		String[] d=main.command.split("\n");
-		try {
-			for(int i=0;i<d.length;i++) {
-				String[] co=d[i].split(" ");
-				if(co.length==0) {
-					continue;
-				}
-				event(co);
-			}
-		} catch (InterruptedException | IOException e) {
+		//String[] d=main.command.split("\n");
+		//try {
+			//for(int i=0;i<d.length;i++) {
+				//String[] co=d[i].split(" ");
+				//if(co.length==0) {
+					//continue;
+				//}
+				//event(co);
+			//}
+		//} catch (InterruptedException | IOException e) {
 			// TODO 閼奉亜濮╅悽鐔稿灇閻拷 catch 閸э拷
-			e.printStackTrace();
-		}
+			//e.printStackTrace();
+		//}
 		while(true) {
 			while(cfg.commandStop) {}
 			if(main.path.equals("View-Main")) {
@@ -44,6 +44,7 @@ public class command extends Thread {
 		}
 	}
 	public static void run(String text) {
+		/*
 		String[] d=text.split("\n");
 		try {
 			for(int i=0;i<d.length;i++) {
@@ -57,6 +58,7 @@ public class command extends Thread {
 			// TODO 閼奉亜濮╅悽鐔稿灇閻拷 catch 閸э拷
 			e.printStackTrace();
 		}
+		*/
 	}
 	public static void event(String[] c) throws InterruptedException, IOException {
 		if(c[0].equals("help")) {
@@ -68,7 +70,9 @@ public class command extends Thread {
 						"hide:隐藏命令提示符\n"+
 						"show:显示命令提示符\n"+
 						"fuck:销毁当前视图\n"+
-						"noPack +id(数据包的id，10进制):屏蔽制定的数据包");
+						"hidePack +lv(隐藏的数据包的等级，可选msg:不接收聊天信息，pos:不接收未知的信息，obj:不接收有关物体的信息，detail:不接收详细信息) +id:屏蔽指定的数据包，默认只接收聊天信息\n"+
+						"showPack +lv(显示的数据包的等级，可选msg:接收聊天信息，pos:接收位置的信息，obj:接收有关物体的信息，detail:接收详细信息) +id:显示指定的数据包，默认只接收聊天信息\n"+
+						"chat +msg:向服务器发送消息");
 		}else if(c[0].equals("")){
 			
 		}else if(c[0].equals("show")) {
@@ -170,6 +174,7 @@ public class command extends Thread {
 					cfg.commandStop=false;
 					return;
 				}
+				
 				System.out.println("\n\n\n\n\n\n");
 				View temp=cfg.allView.get(main.path);
 				temp.hide=true;
@@ -180,15 +185,92 @@ public class command extends Thread {
 			}
 			cfg.jumpView("View-"+c[1]);
 			return;
-		}else if(c[0].equals("noPack")) {
-			if(c.length!=2) {
+		}else if(c[0].equals("hidePack")) {
+			if(c.length!=3) {
 				cfg.println(3, "传递的参数数量不正确");
 				Thread.sleep(100);
 				cfg.commandStop=false;
 				return;
 			}
-			cfg.NP.add(c[1]);
-			cfg.println(1,"此id的数据包不再显示。。。");
+			if(!cfg.allView.containsKey("View-"+c[2])) {
+				cfg.println(3, "视图不存在");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			View v=cfg.allView.get("View-"+c[2]); 
+			if(c[1].equals("msg")) {
+				v.lv[0]=false;
+				cfg.println(1, "成功屏蔽此等级的数据包");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			if(c[1].equals("pos")) {
+				v.lv[1]=false;
+				cfg.println(1, "成功屏蔽此等级的数据包");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			if(c[1].equals("obj")) {
+				v.lv[2]=false;
+				cfg.println(1, "成功屏蔽此等级的数据包");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			if(c[1].equals("detail")) {
+				v.lv[3]=false;
+				cfg.println(1, "成功屏蔽此等级的数据包");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			cfg.println(3,"不存在的等级");
+		}else if(c[0].equals("showPack")) {
+			if(c.length!=3) {
+				cfg.println(3, "传递的参数数量不正确");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			if(!cfg.allView.containsKey("View-"+c[2])) {
+				cfg.println(3, "视图不存在");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			View v=cfg.allView.get("View-"+c[2]); 
+			if(c[1].equals("msg")) {
+				v.lv[0]=true;
+				cfg.println(1, "已显示此等级的数据包");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			if(c[1].equals("pos")) {
+				v.lv[1]=true;
+				cfg.println(1, "已显示此等级的数据包");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			if(c[1].equals("obj")) {
+				v.lv[2]=true;
+				cfg.println(1, "已显示此等级的数据包");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			if(c[1].equals("detail")) {
+				v.lv[3]=true;
+				cfg.println(1, "已显示此等级的数据包");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			cfg.println(3,"不存在的等级");
 		}else if(c[0].equals("chat")) {
 			if(c.length<2) {
 				cfg.println(3, "传递的参数数量不正确");

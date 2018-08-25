@@ -39,6 +39,8 @@ public class View extends Thread{
 	public String leaveMsg="";
 	public boolean showC=false;
 	public int gamemode=0;
+	public long[] time= {0,0};
+	public boolean[] lv= {true,false,false,false};//msg pos obj detail
 	
 	@Override
 	public void run() {
@@ -72,7 +74,8 @@ public class View extends Thread{
 			while(!stop) {
 				try {
 					acceptPack ri=new acceptPack(di,compression);
-					//cfg.println(name,1, "接收到数据包，长度:"+ri.data.length+",id:"+ri.id);
+					if(lv[3])
+						cfg.println(name,1, "接收到数据包，长度:"+ri.data.length+",id:"+ri.id);
 					if(mode==MODE_LOGIN) {
 						if(ri.id==0x00) {
 							cfg.println(name,3,"不能连接到这个服务器:\n"+ri.readString());
@@ -92,7 +95,6 @@ public class View extends Thread{
 					}else if(mode==MODE_PLAY) {
 						if(ri.id==0x00) {
 							int id=ri.readInt();
-							cfg.println(name, 1,"服务器要求保持连接，随机id:"+id);
 							sendPack p=new sendPack(dos,0x00);
 							p.thisPack.writeInt(id);
 							p.sendPack(false, -1);
@@ -145,13 +147,14 @@ public class View extends Thread{
 											"难度:"+difT+"\n"+
 											"最大玩家:"+max+"\n"+
 											"地图类型:"+type);
-							command.run(main.login);
+							//command.run(main.login);
 						}else if(ri.id==0x02) {
 							String msg=ri.readString();
-							cfg.println(this.name, 1,"聊天信息:\n"+msg);
+							if(lv[0])
+								cfg.println(this.name, 1,"聊天信息:"+acceptPack.toChat(msg));
 						}else if(ri.id==0x03) {
-							cfg.println(this.name,1,"服务器时间更新:\n"+
-									"地图时代:"+ri.readLong()+"\t当天的时间:"+ri.readLong());
+							time[0]=ri.readLong();
+							time[1]=ri.readLong();
 						}else if(ri.id==0x04) {
 							int eid=ri.readInt();
 							short slot=ri.readShort();
@@ -170,15 +173,18 @@ public class View extends Thread{
 							if(id!=-1) {
 								byte num=ri.readByte();
 								short s=ri.readShort();
-								cfg.println(this.name, 1,"实体装备更新:\n"+
-											"实体id:"+eid+"\t插槽:"+slot+"\t块id:"+id+"\t物品数量:"+num+"\t块id:"+s);
+								if(lv[2])
+									cfg.println(this.name, 1,"实体装备更新:\n"+
+												"实体id:"+eid+"\t插槽:"+slot+"\t块id:"+id+"\t物品数量:"+num+"\t块id:"+s);
 								continue;
 							}
-							cfg.println(this.name, 1,"实体装备更新:\n"+
-									"实体id:"+eid+"\t插槽:"+slot+"\t块id:空");
+							if(lv[2])
+								cfg.println(this.name, 1,"实体装备更新:\n"+
+										"实体id:"+eid+"\t插槽:"+slot+"\t块id:空");
 						}else if(ri.id==0x05) {
-							cfg.println(this.name, 2,"位置更新！你当前的位置:\n"+
-										"x:"+ri.readInt()+"\ty:"+ri.readInt()+"\tz:"+ri.readInt());
+							if(lv[1])
+								cfg.println(this.name, 2,"位置更新！你当前的位置:\n"+
+											"x:"+ri.readInt()+"\ty:"+ri.readInt()+"\tz:"+ri.readInt());
 						}else if(ri.id==0x06){
 							float heal=ri.readFloat();
 							short food=ri.readShort();
@@ -240,11 +246,13 @@ public class View extends Thread{
 							float ph=ri.readFloat();
 							float p=ri.readFloat();
 							boolean d=ri.readBoolean();
-							cfg.println(this.name, 2,"你的未知被更改:\n"+
-												"X:"+x+"\tY:"+y+"\tZ:"+z+"\tX旋转:"+ph+"\tY旋转:"+p+"\t在地上:"+d);
+							if(lv[1])
+								cfg.println(this.name, 2,"你的位置被更改:\n"+
+														"X:"+x+"\tY:"+y+"\tZ:"+z+"\tX旋转:"+ph+"\tY旋转:"+p+"\t在地上:"+d);
 						}else if(ri.id==0x09) {
 							byte i=ri.readByte();
-							cfg.println(this.name,2,"你选择的在物品栏中的物品索引被更改:"+i);
+							if(lv[2])
+								cfg.println(this.name,2,"你选择的在物品栏中的物品索引被更改:"+i);
 						}else if(ri.id==0x0A) {
 							int eid=ri.readInt();
 							int x=ri.readInt();
@@ -272,50 +280,62 @@ public class View extends Thread{
 								idT="蹲伏";
 							if(id==105)
 								idT="起来";
-							cfg.println(this.name, 1,"实体动画需要更改:\n"+
+							if(lv[2])
+								cfg.println(this.name, 1,"实体动画需要更改:\n"+
 												"实体id:"+eid+"\t动画:"+idT);
 						}else if(ri.id==0x0C) {
 							int eid=ri.readVarInt();
 							String uuid=ri.readString();
 							String name=ri.readString();
-							int x=ri.readIntA();
-							int y=ri.readIntA();
-							int z=ri.readIntA();
+							double x=acceptPack.int2FPN(ri.readInt());
+							double y=acceptPack.int2FPN(ri.readInt());
+							double z=acceptPack.int2FPN(ri.readInt());
 							byte ph=ri.readByte();
 							byte p=ri.readByte();
 							short item=ri.readShort();
-							cfg.println(this.name, 1,"玩家进入当前可见范围:\n"+
+							if(lv[1])
+								cfg.println(this.name, 1,"玩家进入当前可见范围:\n"+
 												"实体id:"+eid+"\t玩家uuid:"+uuid+"\t玩家名字:"+name+"\n"+
 												"X:"+x+"\tY:"+y+"\tZ:"+z+"\tX旋转:"+ph+"\tY旋转:"+p+"\t手上的物品:"+item);
 						}else if(ri.id==0x0D) {
 							int eid=ri.readInt();
 							int item=ri.readInt();
-							cfg.println(this.name, 1,"有人拾取物品，实体id:"+eid+",物品实体id:"+item);
+							if(lv[2])
+								cfg.println(this.name, 1,"有人拾取物品，实体id:"+eid+",物品实体id:"+item);
 						}else if(ri.id==0x11) {
-							cfg.println(this.name,1,"服务器产出经验"+
+							if(lv[2])
+								cfg.println(this.name,1,"服务器产出经验"+
 												"实体id:"+ri.readVarInt()+"\t坐标:\n"+
-												"x:"+ri.readIntA()+"\ty:"+ri.readIntA()+"\tz:"+ri.readIntA()+"\n"+
+												"x:"+acceptPack.int2FPN(ri.readInt())+"\ty:"+acceptPack.int2FPN(ri.readInt())+"\tz:"+acceptPack.int2FPN(ri.readInt())+"\n"+
 												"数量:"+ri.readShort());
 						}else if(ri.id==0x12) {
-							cfg.println(this.name,1,"服务端设置实体速度:\n"+
+							if(lv[2])
+								cfg.println(this.name,1,"服务端设置实体速度:\n"+
 												"实体id:"+ri.readInt()+"\tX速度:"+ri.readShort()+"\tY速度:"+ri.readShort()+"\tZ速度:"+ri.readShort());
 						}else if(ri.id==0x13) {
-							cfg.println(this.name, 1,"实体被摧毁，数量："+ri.readByte());
+							if(lv[2])
+								cfg.println(this.name, 1,"实体被摧毁，数量："+ri.readByte());
 						}else if(ri.id==0x15) {
-							cfg.println(this.name, 1,"实体相对移动，实体id:"+ri.readInt()+"，坐标:\n"+
-												"X:"+ri.readByte()+"\tY:"+ri.readByte()+"\tZ"+ri.readByte());
+							if(lv[1])
+								cfg.println(this.name, 1,"实体相对移动，实体id:"+ri.readInt()+"，坐标:\n"+
+												"X:"+acceptPack.byte2FPN(ri.readByte())+"\tY:"+acceptPack.byte2FPN(ri.readByte())+"\tZ"+acceptPack.byte2FPN(ri.readByte()));
 						}else if(ri.id==0x16) {
-							cfg.println(this.name,1,"实体旋转，实体id："+ri.readInt()+",X旋转:"+ri.readByte()+",Y旋转:"+ri.readByte());
+							if(lv[1])
+								cfg.println(this.name,1,"实体旋转，实体id："+ri.readInt()+",X旋转:"+ri.readByte()+",Y旋转:"+ri.readByte());
 						}else if(ri.id==0x17) {
-							cfg.println(this.name, 1,"实体旋转+移动"+ri.readInt()+",坐标:\n" + 
-												"X:"+ri.readByte()+"\tY:"+ri.readByte()+"\tZ"+ri.readByte()+"\n"+
+							if(lv[1])
+								cfg.println(this.name, 1,"实体旋转+移动"+ri.readInt()+",坐标:\n" + 
+												"X:"+acceptPack.byte2FPN(ri.readByte())+"\tY:"+acceptPack.byte2FPN(ri.readByte())+"\tZ"+acceptPack.byte2FPN(ri.readByte())+"\n"+
 												"X旋转:"+ri.readByte()+"\tY旋转:"+ri.readByte());
 						}else if(ri.id==0x18) {
-							cfg.println(this.name,1,"实体移动超过4个块:"+ri.readInt()+",坐标:\n"+
-												"X:"+ri.readIntA()+"\tY:"+ri.readIntA()+"\tZ:"+ri.readIntA()+"\n"+
+							if(lv[1])
+								cfg.println(this.name,1,"实体移动超过4个块:"+ri.readInt()+",坐标:\n"+
+												"X:"+acceptPack.int2FPN(ri.readInt())+"\tY:"+acceptPack.int2FPN(ri.readInt())+"\tZ:"+acceptPack.int2FPN(ri.readInt())+"\n"+
 												"X旋转:"+ri.readByte()+"\tY旋转:"+ri.readByte());
+							
 						}else if(ri.id==0x19) {
-							cfg.println(this.name,1,"实体头部旋转，实体id:"+ri.readInt()+"，X旋转:"+ri.readByte());
+							if(lv[1])
+								cfg.println(this.name,1,"实体头部旋转，实体id:"+ri.readInt()+"，X旋转:"+ri.readByte());
 						}else if(ri.id==0x1A) {
 							int eid=ri.readInt();
 							byte type=ri.readByte();
@@ -354,7 +374,8 @@ public class View extends Thread{
 								t="烟花爆炸";
 							if(type==18)
 								t="爱上人类";
-							cfg.println(this.name, 1,"实体状态被改变，实体id:"+eid+",改变后状态:"+t);
+							if(lv[2])
+								cfg.println(this.name, 1,"实体状态被改变，实体id:"+eid+",改变后状态:"+t);
 						}else if(ri.id==0x1F) {
 							cfg.println(this.name,1,"你的等级或经验改变，经验条:"+ri.readFloat()+"/1,等级:"+ri.readShort()+"，总经验:"+ri.readShort());
 						}else if(ri.id==0x27) {
@@ -407,7 +428,8 @@ public class View extends Thread{
 								text="产生10个烟雾颗粒";
 							if(m==2002)
 								text="飞溅药水";
-							cfg.println(this.name, 1,"实体影响:\n"+
+							if(lv[2])
+								cfg.println(this.name, 1,"实体影响:\n"+
 												"X:"+ri.readInt()+"\tY:"+ri.readByte()+"\tZ:"+ri.readInt()+"\t效果:"+text);
 						}else if(ri.id==0x2B) {
 							int be=ri.readUnsignedByte();
@@ -441,16 +463,20 @@ public class View extends Thread{
 							short slot=ri.readShort();
 							short bid=ri.readShort();
 							if(bid==-1) {
-								cfg.println(this.name,1,"窗口插槽更新，窗口id:"+id+",插槽id:"+slot+",这个插槽变为空");
+								if(lv[2])
+									cfg.println(this.name,1,"窗口插槽更新，窗口id:"+id+",插槽id:"+slot+",这个插槽变为空");
 							}else {
 								byte num=ri.readByte();
 								short s=ri.readShort();
-								cfg.println(this.name,1,"窗口插槽更新，窗口id:"+id+",插槽id:"+slot+",物品id:"+bid+",数量:"+num+",损坏程度:"+s);
+								if(lv[2])
+									cfg.println(this.name,1,"窗口插槽更新，窗口id:"+id+",插槽id:"+slot+",物品id:"+bid+",数量:"+num+",损坏程度:"+s);
 							}
 						}else if(ri.id==0x30) {
-							cfg.println(this.name, 1,"窗口插槽更新，窗口id:"+ri.readUnsignedByte());
+							if(lv[2])
+								cfg.println(this.name, 1,"窗口插槽更新，窗口id:"+ri.readUnsignedByte());
 						}else if(ri.id==0x31) {
-							cfg.println(this.name, 1,"窗口属性值更新，窗口id:"+ri.readUnsignedByte()+",属性:"+ri.readShort()+",值:"+ri.readShort());
+							if(lv[2])
+								cfg.println(this.name, 1,"窗口属性值更新，窗口id:"+ri.readUnsignedByte()+",属性:"+ri.readShort()+",值:"+ri.readShort());
 						}else if(ri.id==0x32) {
 							int id=ri.readUnsignedByte();
 							short code=ri.readShort();
@@ -460,26 +486,31 @@ public class View extends Thread{
 								text="服务器接受客户端请求，窗口id:";
 							else
 								text="服务器拒绝客户但请求，窗口id:";
-							cfg.println(this.name, 1,text+id+",行动编号:"+code);
+							if(lv[2])
+								cfg.println(this.name, 1,text+id+",行动编号:"+code);
 						}else if(ri.id==0x33) {
-							cfg.println(this.name, 1,"发现公告牌,X:"+ri.readInt()+",Y:"+ri.readShort()+",Z:"+ri.readInt()+",下面是公告牌的消息:\n"+
+							if(lv[2])
+								cfg.println(this.name, 1,"发现公告牌,X:"+ri.readInt()+",Y:"+ri.readShort()+",Z:"+ri.readInt()+",下面是公告牌的消息:\n"+
 												ri.readString()+"\n"+
 												ri.readString()+"\n"+
 												ri.readString()+"\n"+
 												ri.readString());
 						}else if(ri.id==0x36) {
-							cfg.println(this.name, 1,"公告牌编辑器打开,X:"+ri.readInt()+",Y:"+ri.readInt()+",Z:"+ri.readInt());
+							if(lv[2])
+								cfg.println(this.name, 1,"公告牌编辑器打开,X:"+ri.readInt()+",Y:"+ri.readInt()+",Z:"+ri.readInt());
 						}else if(ri.id==0x37) {
 							int cout=ri.readVarInt();
 							String text="下面混统计信息:";
 							for(int i=0;i<cout;i++) {
 								text+="\n统计的名称:"+ri.readString()+",值:"+ri.readVarInt()+"\n-----------------------------------------------------";
 							}
-							cfg.println(this.name, 1,text);
+							if(lv[2])
+								cfg.println(this.name, 1,text);
 						}else if(ri.id==0x38) {
 							cfg.println(this.name, 1,"玩家名:"+ri.readString()+",在线:"+ri.readBoolean()+",延迟:"+ri.readShort()+"ms");
 						}else if(ri.id==0x39) {
-							cfg.println(this.name, 1,"玩家能力:"+ri.readByte()+",飞行速度:"+ri.readFloat()+",行走速度:"+ri.readFloat());
+							if(lv[2])
+								cfg.println(this.name, 1,"玩家能力:"+ri.readByte()+",飞行速度:"+ri.readFloat()+",行走速度:"+ri.readFloat());
 						}else if(ri.id==0x3A) {
 							cfg.println(this.name, 1,"玩家列表完毕:"+ri.readString());
 						}else if(ri.id==0x3B) {
@@ -493,14 +524,17 @@ public class View extends Thread{
 								text="删除记分板";
 							if(flag==2)
 								text="更新显示文本";
-							cfg.println(this.name, 1,"记分板更新:"+text+",玩家名称:"+name+",值:"+value);
+							if(lv[2])
+								cfg.println(this.name, 1,"记分板更新:"+text+",玩家名称:"+name+",值:"+value);
 						}else if(ri.id==0x3C) {
 							String name=ri.readString();
 							byte o=ri.readByte();
 							if(o==0)
-								cfg.println(this.name, 1,"分数更新，玩家名:"+name+"，分数名称:"+ri.readString()+",值:"+ri.readInt());
+								if(lv[2])
+									cfg.println(this.name, 1,"分数更新，玩家名:"+name+"，分数名称:"+ri.readString()+",值:"+ri.readInt());
 							else
-								cfg.println(this.name, 1,"分数删除:"+name);
+								if(lv[2])
+									cfg.println(this.name, 1,"分数删除:"+name);
 						}else if(ri.id==0x3D) {
 							byte o=ri.readByte();
 							String text="未知";
@@ -510,7 +544,8 @@ public class View extends Thread{
 								text="边栏";
 							if(o==2)
 								text="名字下面";
-							cfg.println(this.name,1,"记分板显示，位置:"+text+",分数名称:"+ri.readString());
+							if(lv[2])
+								cfg.println(this.name,1,"记分板显示，位置:"+text+",分数名称:"+ri.readString());
 						}else if(ri.id==0x3E) {
 							String name=ri.readString();
 							byte mode=ri.readByte();
@@ -529,7 +564,8 @@ public class View extends Thread{
 								for(int i=0;i<num;i++) {
 									list+=ri.readString()+"\t";
 								}
-								cfg.println(this.name,1,"团队创建，名称:"+name+",显示名称:"+sname+",团队前缀:"+q+",团队后缀:"+h+",友善之火:"+ysText+",玩家数量:"+num+"\n"+list);
+								if(lv[2])
+									cfg.println(this.name,1,"团队创建，名称:"+name+",显示名称:"+sname+",团队前缀:"+q+",团队后缀:"+h+",友善之火:"+ysText+",玩家数量:"+num+"\n"+list);
 								continue;
 							}
 							if(mode==2) {
@@ -542,7 +578,8 @@ public class View extends Thread{
 									ysText="关闭";
 								if(ys==1)
 									ysText="打开";
-								cfg.println(this.name,1,"团队信息更改:团队名称"+name+"，显示名称:"+sname+",团队前缀:"+q+",团队后缀:"+h+",友善之火:"+ysText);
+								if(lv[2])
+									cfg.println(this.name,1,"团队信息更改:团队名称"+name+"，显示名称:"+sname+",团队前缀:"+q+",团队后缀:"+h+",友善之火:"+ysText);
 								continue;
 							}
 							if(mode==3||mode==4) {

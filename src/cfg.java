@@ -64,6 +64,9 @@ public class cfg {
 		}
 		System.out.println("\n\n\n\n\n\n");
 		View temp=allView.get(id);
+		View now=allView.get(main.path);
+		if(now!=null)
+			now.hide=true;
 		temp.hide=false;
 		System.out.println(temp.leaveMsg);
 		main.path=id;

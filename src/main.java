@@ -3,8 +3,8 @@ import java.util.Properties;
 
 public class main {
 	public static String path="View-Main";
-	public static String command=File.readFile_string(File.getPath()+"\\command.mcs");
-	public static String login=File.readFile_string(File.getPath()+"\\login.mcs");
+	//public static String command=File.readFile_string(File.getPath()+"\\command.mcs");
+	//public static String login=File.readFile_string(File.getPath()+"\\login.mcs");
 	public static void main(String[] args) {
 		// TODO 閼奉亜濮╅悽鐔稿灇閻ㄥ嫭鏌熷▔鏇炵摠閺嶏拷
 		System.out.println("MCShell Beta-0.1 by GreyCloudTeam");
@@ -15,6 +15,7 @@ public class main {
 		System.out.println("github.com/greyCloudTeam/MCShell");
 		System.out.println("-------------------------------------------------------");
 		System.out.println("输入 \"help\" 来获取帮助信息");
+		//System.out.println(acceptPack.toChat("{\"extra\":[{\"color\":\"white\",\"text\":\"[\"},{\"color\":\"green\",\"text\":\"垃圾废铁\"},{\"color\":\"white\",\"text\":\"] [\"},{\"bold\":true,\"color\":\"green\",\"text\":\"生存世界\"},{\"color\":\"white\",\"text\":\"]\\u003c\"},{\"color\":\"dark_green\",\"text\":\"qodobopo\"},\"\\u003e xty\"],\"text\":\"\"}"));
 		command t=new command();
 		t.start();
 	}

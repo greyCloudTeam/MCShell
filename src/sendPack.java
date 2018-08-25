@@ -33,7 +33,7 @@ public class sendPack {
 		thisPack.writeBytes(data);
 	}
 	public void writeChat(String data) throws IOException{
-		String text="{\"extra\":[],\"text\":\""+data+"\"}";
+		String text=data;
 		writeString(text);
 	}
 	public void writeBoolean(boolean value) throws IOException {
