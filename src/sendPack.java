@@ -32,6 +32,17 @@ public class sendPack {
 		writeVarInt(data.length());
 		thisPack.writeBytes(data);
 	}
+	public void writeChat(String data) throws IOException{
+		String text="{\"extra\":[],\"text\":\""+data+"\"}";
+		writeString(text);
+	}
+	public void writeBoolean(boolean value) throws IOException {
+		if(value) {
+			thisPack.writeByte(0x01);
+		}else {
+			thisPack.writeByte(0x00	);
+		}
+	}
 	public void sendPack(boolean compress,int maxSize) throws IOException {
 		byte[] data=b.toByteArray();
 		if(compress) {

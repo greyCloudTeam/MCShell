@@ -14,6 +14,7 @@ import com.google.gson.JsonParser;
 public class cfg {
 	public static boolean commandStop=false;
 	public static String username="MCShell";
+	public static ArrayList<String> NP=new ArrayList<String>();
 	public static Map<String,View> allView=new HashMap<String,View>();
 	public static int allViewNum=0;
 	public static void println(int lv,String msg) {

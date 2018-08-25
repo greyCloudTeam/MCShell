@@ -72,10 +72,11 @@ public class View extends Thread{
 			while(!stop) {
 				try {
 					acceptPack ri=new acceptPack(di,compression);
-					cfg.println(name,1, "接收到数据包，长度:"+ri.data.length+"id:"+ri.id);
+					//cfg.println(name,1, "接收到数据包，长度:"+ri.data.length+",id:"+ri.id);
 					if(mode==MODE_LOGIN) {
 						if(ri.id==0x00) {
-							throw new RuntimeException("不能连接到这个服务器:\n"+ri.readString());
+							cfg.println(name,3,"不能连接到这个服务器:\n"+ri.readString());
+							break;
 						}else if(ri.id==0x02) {
 							uuid=ri.readString();
 							this.username=ri.readString();
@@ -144,6 +145,7 @@ public class View extends Thread{
 											"难度:"+difT+"\n"+
 											"最大玩家:"+max+"\n"+
 											"地图类型:"+type);
+							command.run(main.login);
 						}else if(ri.id==0x02) {
 							String msg=ri.readString();
 							cfg.println(this.name, 1,"聊天信息:\n"+msg);
@@ -566,11 +568,10 @@ public class View extends Thread{
 				}catch(EOFException e1) {
 					//cfg.println(name,3,"鐠囪褰囧☉鍫熶紖閺冭泛鍤柨锟�:"+e1);
 					//break;
-				}catch(RuntimeException e2) {
-					cfg.println(name,3,"登陆时发生错误:"+e2);
-					break;
 				}catch(Exception e3) {
 					cfg.println(name,3,"执行命令时发生错误，你与服务器的连接已断开:"+e3);
+					e3.printStackTrace();
+					break;
 				}
 			}
 		}catch(Exception e){

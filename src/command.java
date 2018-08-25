@@ -1,3 +1,4 @@
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -5,6 +6,20 @@ public class command extends Thread {
 	Scanner s=new Scanner(System.in);
 	@Override
 	public void run() {
+		//先执行command。mcs的命令
+		String[] d=main.command.split("\n");
+		try {
+			for(int i=0;i<d.length;i++) {
+				String[] co=d[i].split(" ");
+				if(co.length==0) {
+					continue;
+				}
+				event(co);
+			}
+		} catch (InterruptedException | IOException e) {
+			// TODO 閼奉亜濮╅悽鐔稿灇閻拷 catch 閸э拷
+			e.printStackTrace();
+		}
 		while(true) {
 			while(cfg.commandStop) {}
 			if(main.path.equals("View-Main")) {
@@ -28,7 +43,22 @@ public class command extends Thread {
 			}
 		}
 	}
-	public void event(String[] c) throws InterruptedException, IOException {
+	public static void run(String text) {
+		String[] d=text.split("\n");
+		try {
+			for(int i=0;i<d.length;i++) {
+				String[] co=d[i].split(" ");
+				if(co.length==0) {
+					continue;
+				}
+				event(co);
+			}
+		} catch (InterruptedException | IOException e) {
+			// TODO 閼奉亜濮╅悽鐔稿灇閻拷 catch 閸э拷
+			e.printStackTrace();
+		}
+	}
+	public static void event(String[] c) throws InterruptedException, IOException {
 		if(c[0].equals("help")) {
 			cfg.println(1, "下面是MCShell的全部命令:\n"+
 						"listPing +ip +port:获取一个服务器的信息\n"+
@@ -37,7 +67,8 @@ public class command extends Thread {
 						"in +token(通过 \"login\" 命令创建视图后输出的视图id):切换视图\n"+
 						"hide:隐藏命令提示符\n"+
 						"show:显示命令提示符\n"+
-						"fuck:销毁当前视图");
+						"fuck:销毁当前视图\n"+
+						"noPack +id(数据包的id，10进制):屏蔽制定的数据包");
 		}else if(c[0].equals("")){
 			
 		}else if(c[0].equals("show")) {
@@ -149,6 +180,91 @@ public class command extends Thread {
 			}
 			cfg.jumpView("View-"+c[1]);
 			return;
+		}else if(c[0].equals("noPack")) {
+			if(c.length!=2) {
+				cfg.println(3, "传递的参数数量不正确");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			cfg.NP.add(c[1]);
+			cfg.println(1,"此id的数据包不再显示。。。");
+		}else if(c[0].equals("chat")) {
+			if(c.length<2) {
+				cfg.println(3, "传递的参数数量不正确");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			if(main.path.equals("View-Main")) {
+				cfg.println(3, "不能在Main视图中使用此命令");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			String text="";
+			for(int i=1;i<c.length;i++) {
+				if(i==1) {
+					text+=c[i];
+				}else {
+					text+=" "+c[i];
+				}
+			}
+			DataOutputStream dos=cfg.allView.get(main.path).dos;
+			sendPack sp=new sendPack(dos,0x01);
+			sp.writeChat(text);
+			sp.sendPack(cfg.allView.get(main.path).compression, cfg.allView.get(main.path).maxPackSize);
+		}else if(c[0].equals("hit")) {
+			if(c.length<3) {
+				cfg.println(3, "传递的参数数量不正确");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			if(main.path.equals("View-Main")) {
+				cfg.println(3, "不能在Main视图中使用此命令");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			byte flag=-1;
+			if(c[2].equals("l")) {
+				flag=0;
+			}
+			if(c[2].equals("r")) {
+				flag=1;
+			}else {
+				cfg.println(3, "第三个参数不是\"l\"就是\"r\"，不能是其他的值");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			DataOutputStream dos=cfg.allView.get(main.path).dos;
+			sendPack sp=new sendPack(dos,0x02);
+			sp.thisPack.writeInt(Integer.parseInt(c[1]));
+			sp.thisPack.writeByte(flag);
+			sp.sendPack(cfg.allView.get(main.path).compression, cfg.allView.get(main.path).maxPackSize);
+		}else if(c[0].equals("land")) {
+			if(c.length!=2) {
+				cfg.println(3, "传递的参数数量不正确");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			if(main.path.equals("View-Main")) {
+				cfg.println(3, "不能在Main视图中使用此命令");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			DataOutputStream dos=cfg.allView.get(main.path).dos;
+			sendPack sp=new sendPack(dos,0x03);
+			if(c[1].equals("f"))
+				sp.writeBoolean(false);
+			if(c[1].equals("t")) {
+				sp.writeBoolean(true);
+			}
+			sp.sendPack(cfg.allView.get(main.path).compression, cfg.allView.get(main.path).maxPackSize);
 		}else{
 			cfg.println(3, "未知的命令\""+c[0]+"\"");
 		}
