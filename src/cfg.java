@@ -103,6 +103,7 @@ public class cfg {
 		OutputStream os=null;
 		DataOutputStream dos=null;
 		try {
+			System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 			int portT=Integer.parseInt(port);
 			s=new Socket(ip,portT);
 			is=s.getInputStream();
@@ -135,6 +136,10 @@ public class cfg {
 				throw new RuntimeException("收到的数据包不正确！");
 			}
 			String motdT=ri.readString();
+			println(1,motdT);
+			//System.out.println(motdT);
+			//System.out.println(motdT);
+			//System.out.println(motdT);
 			cfg.println(1,"-----------------------------------------------------------------------------");
 			JsonParser json=new JsonParser();
             JsonElement part5 = json.parse(motdT);

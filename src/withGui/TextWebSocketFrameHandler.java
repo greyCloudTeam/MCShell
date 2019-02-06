@@ -26,17 +26,32 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
         if(data.getAsJsonObject().get("id").getAsInt()==1) {
         	if(data.getAsJsonObject().get("key").getAsString().equals(cfg.key)) {
         		ctx.channel().writeAndFlush(new TextWebSocketFrame("{\"id\":2}"));
+        		User temp=new User();
+        		//temp.ctx=ctx;
         		cfg.user.put(ctx.channel().id().asLongText(), new User());
         		System.out.println(ctx.channel().id().asLongText()+"通过验证");
         	}else {
         		ctx.channel().writeAndFlush(new TextWebSocketFrame("{\"id\":3}"));
         		System.out.println(ctx.channel().id().asLongText()+"验证失败");
         	}
+        	return;
         }
         if(data.getAsJsonObject().get("id").getAsInt()==0){
         	ctx.channel().writeAndFlush(new TextWebSocketFrame("{\"id\":1,\"var\":\""+cfg.var+"\"}"));
+        	return;
         }
- 
+        if(!cfg.user.containsKey(ctx.channel().id().asLongText())) {
+    		ctx.channel().close();
+    		System.out.println("拦截了一个非法请求");
+    		return;
+    	}
+        User u=cfg.user.get(ctx.channel().id().asLongText());
+        u.ctx=ctx;
+        if(data.getAsJsonObject().get("id").getAsInt()==4){
+        	if(data.getAsJsonObject().get("name").getAsString().equals("listPing")) {
+        		u.pingList(data.getAsJsonObject().get("ip").getAsString(),data.getAsJsonObject().get("port").getAsString());
+        	}
+        }
  
         //读取收到的信息写回到客户端
         //ctx.channel().writeAndFlush(new TextWebSocketFrame("服务器时间: " + LocalDateTime.now()));
@@ -80,6 +95,7 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         System.out.println("异常发生");
+        cause.printStackTrace();
         ctx.close();
     }
 }
