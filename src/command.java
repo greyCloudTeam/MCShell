@@ -72,7 +72,8 @@ public class command extends Thread {
 						"fuck:销毁当前视图\n"+
 						"hidePack +lv(隐藏的数据包的等级，可选msg:不接收聊天信息，pos:不接收未知的信息，obj:不接收有关物体的信息，detail:不接收详细信息) +id:屏蔽指定的数据包，默认只接收聊天信息\n"+
 						"showPack +lv(显示的数据包的等级，可选msg:接收聊天信息，pos:接收位置的信息，obj:接收有关物体的信息，detail:接收详细信息) +id:显示指定的数据包，默认只接收聊天信息\n"+
-						"chat +msg:向服务器发送消息");
+						"chat +msg:向服务器发送消息"+
+						"login_gui +ip +port +versionNum(你需要通过 \"listPing\" 命令来获取，注意，不是游戏版本，是协议版本):登陆一个服务器，执行完毕后会打开一个gui窗口，仅支持1.13.2\n");
 		}else if(c[0].equals("")){
 			
 		}else if(c[0].equals("show")) {
@@ -347,6 +348,46 @@ public class command extends Thread {
 				sp.writeBoolean(true);
 			}
 			sp.sendPack(cfg.allView.get(main.path).compression, cfg.allView.get(main.path).maxPackSize);
+		}else if(c[0].equals("ping")){
+			if(!main.path.equals("View-Main")) {
+				cfg.println(3, "不能在非Main视图中使用此命令");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			if(c.length!=3) {
+				cfg.println(3, "传递的参数数量不正确");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			cfg.println(1, "请等待....");
+			cfg.ping(c[1],c[2]);
+			//return;
+		}else if(c[0].equals("login_gui")) {
+			if(!main.path.equals("View-Main")) {
+				cfg.println(3, "不能在非Main视图中使用此命令");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			if(c.length!=4) {
+				cfg.println(3, "传递的参数数量不正确");
+				Thread.sleep(100);
+				cfg.commandStop=false;
+				return;
+			}
+			cfg.println(1, "请等待....");
+			gui n=new gui();
+			n.ip=c[1];
+			n.port=Integer.parseInt(c[2]);
+			n.version=Integer.parseInt(c[3]);
+			//n.name="View-"+(cfg.allViewNum+1);
+			//cfg.println(2,"成功创建视图，视图id:"+(cfg.allViewNum+1)+"请使用\"in\"命令来切换视图，进入视图后命令提示符可能是隐藏的，你可以输入 \"show\" 命令来显示命令提示符");
+			//cfg.allView.put(n.name, n);
+			n.login();
+			//cfg.allViewNum++;
+			//return;
 		}else{
 			cfg.println(3, "未知的命令\""+c[0]+"\"");
 		}

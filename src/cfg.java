@@ -96,6 +96,48 @@ public class cfg {
 
 	     return result;
 	}
+	public static void ping(String ip,String port) {
+		Socket s;
+		InputStream is=null;
+		DataInputStream di=null;
+		OutputStream os=null;
+		DataOutputStream dos=null;
+		try {
+			int portT=Integer.parseInt(port);
+			s=new Socket(ip,portT);
+			is=s.getInputStream();
+			di=new DataInputStream(is);
+			os=s.getOutputStream();
+			dos=new DataOutputStream(os);
+			cfg.println(1,"ping....");
+			
+			sendPack ping=new sendPack(dos,0x01);
+			ping.thisPack.writeLong(System.currentTimeMillis());
+			
+			ping.sendPack(false,-1);
+			dos.flush();
+			
+			acceptPack ri=new acceptPack(di,false);
+			println(1, "接收到数据包，长度:"+ri.data.length+"，id:"+ri.id);
+			if(ri.id!=0x01) {
+				throw new RuntimeException("接收到的数据包不正确！");
+			}
+			cfg.println(1,"服务器延迟,"+(System.currentTimeMillis()-ri.readLong())+"ms");
+		}catch(RuntimeException e) {
+			e.printStackTrace();
+		}catch(Exception e) {
+			cfg.println(2,"服务端可能禁止了ping");
+		}
+		
+		cfg.println(1,"完成！");
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			// TODO 閼奉亜濮╅悽鐔稿灇閻拷 catch 閸э拷
+			e.printStackTrace();
+		}
+		cfg.commandStop=false;
+	}
 	public static void pingList(String ip,String port) {
 		Socket s;
 		InputStream is=null;
@@ -103,7 +145,7 @@ public class cfg {
 		OutputStream os=null;
 		DataOutputStream dos=null;
 		try {
-			System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+			//System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 			int portT=Integer.parseInt(port);
 			s=new Socket(ip,portT);
 			is=s.getInputStream();
@@ -178,7 +220,7 @@ public class cfg {
 		
 		try {
 			cfg.println(1,"ping....");
-			
+			while(true) {
 			sendPack ping=new sendPack(dos,0x01);
 			ping.thisPack.writeLong(System.currentTimeMillis());
 			
@@ -191,6 +233,7 @@ public class cfg {
 				throw new RuntimeException("接收到的数据包不正确！");
 			}
 			cfg.println(1,"服务器延迟,"+(System.currentTimeMillis()-ri.readLong())+"ms");
+			}
 		}catch(RuntimeException e) {
 			e.printStackTrace();
 		}catch(Exception e) {
@@ -206,5 +249,4 @@ public class cfg {
 		}
 		cfg.commandStop=false;
 	}
-
 }
