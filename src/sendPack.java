@@ -43,6 +43,9 @@ public class sendPack {
 			thisPack.writeByte(0x00	);
 		}
 	}
+	public int getSize() {
+		return thisPack.size();
+	}
 	public void sendPack(boolean compress,int maxSize) throws IOException {
 		byte[] data=b.toByteArray();
 		if(compress) {

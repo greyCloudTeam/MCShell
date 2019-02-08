@@ -2,6 +2,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Scanner;
 
+import javax.swing.text.BadLocationException;
+
 public class command extends Thread {
 	Scanner s=new Scanner(System.in);
 	@Override
@@ -40,6 +42,9 @@ public class command extends Thread {
 			} catch (InterruptedException | IOException e) {
 				// TODO 閼奉亜濮╅悽鐔稿灇閻拷 catch 閸э拷
 				e.printStackTrace();
+			} catch (BadLocationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}
@@ -60,7 +65,7 @@ public class command extends Thread {
 		}
 		*/
 	}
-	public static void event(String[] c) throws InterruptedException, IOException {
+	public static void event(String[] c) throws InterruptedException, IOException, BadLocationException {
 		if(c[0].equals("help")) {
 			cfg.println(1, "下面是MCShell的全部命令:\n"+
 						"listPing +ip +port:获取一个服务器的信息\n"+
