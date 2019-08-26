@@ -17,6 +17,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.UIManager;
 import javax.swing.JEditorPane;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
@@ -28,6 +29,7 @@ import java.awt.Color;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -37,6 +39,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Vector;
 import java.awt.event.ActionEvent;
+import javax.swing.JTextField;
 
 
 public class gui extends JFrame {
@@ -64,13 +67,15 @@ public class gui extends JFrame {
 	public Vector vName = new Vector();
 	public DefaultTableModel model = new DefaultTableModel(vData, vName);
 	//下面是ui
-	public JTextPane textPane = new JTextPane();
+	public JTextPane output = new JTextPane();
 	public JPanel contentPane;
 	public JLabel lblNewLabel_1 = new JLabel("当前状态:准备就绪");
 	public JTable table = new JTable();
-	public Document docs = textPane.getDocument();
+	public Document docs = output.getDocument();
 	public SimpleAttributeSet attrset = new SimpleAttributeSet();
 	private JTable table_1;
+	private JTextField input;
+	public static gui guiApi=null;
 	
 	/**
 	 * Launch the application.
@@ -78,19 +83,22 @@ public class gui extends JFrame {
 	 */
 	public static void main(String[] args) throws BadLocationException {
 		//调试
-		gui a=new gui();
-		a.ip="yxnat.softdev.top";
-		a.port=12512;
-		a.version=404;
-		a.login();
+		guiApi=new gui();
+		/*
+			a.ip="yxnat.softdev.top";
+			a.port=12512;
+			a.version=404;
+			a.login();
+		*/
+		guiApi.setTitle("MCShell");
+		guiApi.setVisible(true);
 	}
 	public void login() {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					//gui frame = new gui();
-					setTitle("MCShell-"+ip+":"+port);
-					setVisible(true);
+					
 					
 					t.start();
 				} catch (Exception e) {
@@ -104,6 +112,11 @@ public class gui extends JFrame {
 	 * @throws BadLocationException 
 	 */
 	public gui() throws BadLocationException {
+		try {
+		      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) { 
+			e.printStackTrace();
+		}
 		setResizable(false);
 		setFont(new Font("微软雅黑", Font.PLAIN, 15));
 		
@@ -125,48 +138,101 @@ public class gui extends JFrame {
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBounds(10, 10, 820, 327);
 		panel.add(scrollPane);
+		output.setFont(new Font("新宋体", Font.PLAIN, 12));
 		
-		
-		textPane.setEditable(false);
-		
-		scrollPane.setViewportView(textPane);
-		JTextPane txtpnmcs = new JTextPane();
+		output.setEditable(false);
+		//output.addActionListener(c);
+		scrollPane.setViewportView(output);
 		JButton button = new JButton("执行");
+		
+		input = new JTextField();
+		input.setFont(new Font("新宋体", Font.PLAIN, 14));
+		input.setText("[mcs]");
+		input.setBounds(10, 343, 727, 23);
+		panel.add(input);
+		input.setColumns(10);
 		
 		button.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
+					
+					/**
+					 * 命令处理
+					 */
 					StyleConstants.setFontSize(attrset,12);
 					StyleConstants.setForeground(attrset, Color.blue);
-		            docs.insertString(docs.getLength(), "[USER]"+txtpnmcs.getText()+"\n", attrset);//对文本进行追加
+					String command_text=input.getText();
+		            if(command_text.length()>=5&&command_text.substring(0, 5).equals("[mcs]")) {
+		            	docs.insertString(docs.getLength(), "[USER][MCSHELL]"+command_text.substring(5,command_text.length())+"\n", attrset);//对文本进行追加
+			            output.setCaretPosition(output.getStyledDocument().getLength());
+			            input.setText("[mcs]");
+			            String command_this=command_text.substring(5,command_text.length());
+			            String[] arr=command_this.split(" ");
+			            if(arr[0].equals("help")) {
+			            	log("[INFO]帮助信息：\n"+
+			            			"\thelp>获取帮助信息\n"+
+			            			"\tping +ip +port>获取服务器延迟\n"+
+			            			"\tpingList +ip +port>获取服务器的motd信息\n"+
+			            			"\tlogin +ip +port +version:服务器的版本号，通过pingList命令获取>登入服务器并创建视图\n"
+			            			+ "\tclean [+ViewId:视图id，为空则默认为主视图]>清空一个视图的内容",Color.BLACK);
+			            	return;
+			            }else if(arr[0].equals("ping")) {
+			            	if(arr.length!=3) {
+			            		log("[ERROR]传递的参数不正确",Color.RED);
+			            		return;
+			            	}
+			            	button.setEnabled(false);
+			            	gui.ping(arr[1],arr[2]);
+			            }
+			            else {
+			            	log("[ERROR]找不到此命令",Color.RED);
+			            }
+		            }else {
+		            	docs.insertString(docs.getLength(), "[USER[SERVER]"+command_text+"\n", attrset);
+		            	output.setCaretPosition(output.getStyledDocument().getLength());
+			            input.setText("");
+		            }
+		            
 		        } catch (BadLocationException e1) {
 		            e1.printStackTrace();
 		        }
+				
 				
 				//textArea.paintImmediately(textArea.getBounds());
 			}
 		});
 		
 		
-		StyleConstants.setFontSize(attrset,12);
-		StyleConstants.setForeground(attrset, Color.black);
-        docs.insertString(docs.getLength(), "[INFO]MCShell_gui ui加载完毕，正在准备登陆\n", attrset);//对文本进行追加
+		input.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent paramKeyEvent) {
+                if(paramKeyEvent.getKeyChar()=='\n'){
+                    button.doClick();
+                }
+                if(paramKeyEvent.getKeyCode() == KeyEvent.VK_A && paramKeyEvent.isControlDown()){
+                	input.setText("[mcs]");
+                }
+                if(paramKeyEvent.getKeyCode() == KeyEvent.VK_Z && paramKeyEvent.isControlDown()){
+                	input.setText("/");
+                }
+            }
+        });
+		
+		
+		
         
-		button.setBounds(747, 347, 83, 21);
+		button.setBounds(747, 343, 83, 25);
 		panel.add(button);
-		
-		
-		txtpnmcs.setText("[mcs]");
-		txtpnmcs.setForeground(Color.GREEN);
-		txtpnmcs.setBackground(Color.BLACK);
-		txtpnmcs.setBounds(10, 347, 727, 21);
-		panel.add(txtpnmcs);
 		
 		JLabel lblNewLabel = new JLabel("在这里输入的所有消息都会直接发送给服务器，以\"/\"开头为服务器指令，以\"[mcs]\"开头为MCShell指令");
 		lblNewLabel.setBounds(10, 373, 820, 15);
 		panel.add(lblNewLabel);
+		
+		
+		
+		
         JPanel panel_2 = new JPanel();
         tabbedPane.addTab("玩家信息",new ImageIcon(), panel_2, "当前玩家的列表，玩家的坐标，延迟等");
         panel_2.setLayout(null);
@@ -195,24 +261,36 @@ public class gui extends JFrame {
 		table_1 = new JTable();
 		table_1.setModel(model);
 		scrollPane_1.setViewportView(table_1);
+		lblNewLabel_1.setFont(new Font("宋体", Font.PLAIN, 13));
 		
 		
 		lblNewLabel_1.setForeground(Color.RED);
-		lblNewLabel_1.setBounds(10, 428, 835, 15);
+		lblNewLabel_1.setBounds(7, 429, 835, 15);
 		contentPane.add(lblNewLabel_1);
 		t.c=this;
+		
+		StyleConstants.setFontSize(attrset,12);
+		StyleConstants.setForeground(attrset, Color.black);
+        docs.insertString(docs.getLength(), "[INFO]MCShell_gui ui加载完毕\n"
+        		+ "\tMCShell版本:gui-beta1.0\n"
+        		+ "\t作者:caiwen\n"
+        		+ "\tEmail:3102733279@qq.com(出现bug请反馈)\n"
+        		+ "[INFO]在鼠标焦点在下面的指令框时，按Enter键可直接执行命令，按Ctrl+A键可将指令框内容更改为“[mcs]”，按Ctrl+Z键可将指令框内容更改为“/”，执行“[mcs]help”获取帮助信息\n", attrset);//对文本进行追加
 	}
 	public void log(String msg,Color c,boolean br) throws BadLocationException {
 		StyleConstants.setForeground(attrset, c);
 		if(br) {
 			docs.insertString(docs.getLength(), msg+"\n", attrset);//对文本进行追加
+			output.setCaretPosition(output.getStyledDocument().getLength());
 		}else {
 			docs.insertString(docs.getLength(), msg, attrset);//对文本进行追加
+			output.setCaretPosition(output.getStyledDocument().getLength());
 		}
 	}
 	public void log(String msg,Color c) throws BadLocationException {
 		StyleConstants.setForeground(attrset, c);
 		docs.insertString(docs.getLength(), msg+"\n", attrset);//对文本进行追加
+		output.setCaretPosition(output.getStyledDocument().getLength());
 	}
 	public void addPacket(String id,String size) {
 		Vector vRow1 = new Vector();
@@ -225,6 +303,41 @@ public class gui extends JFrame {
 		if(vData.size()==50) {
 			vData.clear();
 		}
+	}
+	public static void ping(String ip,String port) throws BadLocationException {
+		Socket s;
+		InputStream is=null;
+		DataInputStream di=null;
+		OutputStream os=null;
+		DataOutputStream dos=null;
+		try {
+			int portT=Integer.parseInt(port);
+			s=new Socket(ip,portT);
+			is=s.getInputStream();
+			di=new DataInputStream(is);
+			os=s.getOutputStream();
+			dos=new DataOutputStream(os);
+			guiApi.log("[PING]ping....",Color.blue);
+			
+			sendPack ping=new sendPack(dos,0x01);
+			ping.thisPack.writeLong(System.currentTimeMillis());
+			
+			ping.sendPack(false,-1);
+			dos.flush();
+			
+			acceptPack ri=new acceptPack(di,false);
+			//println(1, "接收到数据包，长度:"+ri.data.length+"，id:"+ri.id);
+			if(ri.id!=0x01) {
+				guiApi.log("[PING][ERROR]接收到的数据包不正确！",Color.red);
+			}
+			guiApi.log("[PING]服务器延迟,"+(System.currentTimeMillis()-ri.readLong())+"ms",Color.blue);
+		}catch(RuntimeException e) {
+			guiApi.log("[PING][ERROR]未知的错误："+e.getMessage(),Color.red);
+		}catch(Exception e) {
+			guiApi.log("[PING][ERROR]服务端可能禁止了ping",Color.red);
+		}
+		
+		guiApi.log("完成！",Color.green);
 	}
 }
 
@@ -324,4 +437,6 @@ class thread extends Thread{
 			
 		}
 	}
+	
+	
 }

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="G:/gson-2.8.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="G:/FlatSwing.jar"/>
+	<classpathentry kind="lib" path="F:/gson-2.8.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
